@@ -2,13 +2,16 @@ import React from 'react';
 import { Platform } from 'react-native';
 import { createStackNavigator, createBottomTabNavigator } from 'react-navigation';
 
+
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
+import ThingScreen from '../screens/ThingScreen';
 import AddScreen from '../screens/AddScreen';
 import MyScreen from '../screens/MyScreen';
 
 const HomeStack = createStackNavigator({
   Home: HomeScreen,
+  Thing: ThingScreen
 });
 
 HomeStack.navigationOptions = {
@@ -18,8 +21,8 @@ HomeStack.navigationOptions = {
       focused={focused}
       name={
         Platform.OS === 'ios'
-          ? `ios-information-circle${focused ? '' : '-outline'}`
-          : 'md-information-circle'
+          ? `ios-pin`
+          : 'md-pin'
       }
     />
   ),
@@ -34,7 +37,7 @@ AddStack.navigationOptions = {
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
-      name={Platform.OS === 'ios' ? 'ios-link' : 'md-link'}
+      name={Platform.OS === 'ios' ? 'ios-camera' : 'md-camera'}
     />
   ),
 };
@@ -48,7 +51,7 @@ MyStack.navigationOptions = {
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
-      name={Platform.OS === 'ios' ? 'ios-options' : 'md-options'}
+      name={Platform.OS === 'ios' ? 'ios-star' : 'md-star'}
     />
   ),
 };

@@ -1,69 +1,116 @@
 import React from 'react';
-import {
-  Image,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import { WebBrowser } from 'expo';
+import { Image, ScrollView, TouchableOpacity, View, PermissionsAndroid, Platform, Text, Picker } from 'react-native';
+import { Icon, WebBrowser } from 'expo';
+import { Button } from '@shoutem/ui';
+import { StyleProvider } from '@shoutem/theme';
+import MapView, { Marker, ProviderPropType } from 'react-native-maps';
+import Popover from 'react-native-popover-view';
+import SwiperFlatList from 'react-native-swiper-flatlist';
 
 import { MonoText } from '../components/StyledText';
 import { IntroScreen } from '../screens/IntroScreen';
+import styles from './HomeScreen.styles.js';
 
 export default class HomeScreen extends React.Component {
-  static navigationOptions = {
-    header: null,
+  state = {
+    filtersVisible: false,
+    thingsAvailability: 'all'
+  }
+
+  static navigationOptions = ({ navigation }) => {
+    const { params = {} } = navigation.state;
+    return {
+      title: 'Home',
+      //header: null,
+      headerRight: <Button onPress={params.openFilters} title='filter'>
+                    <Icon.MaterialCommunityIcons 
+                    name={'filter'} 
+                    size={28} 
+                    style={styles.iconFilter} />
+                  </Button>
+    }
   };
 
+  componentDidMount() {
+    this.props.navigation.setParams({ openFilters: this.showFilters });
+  }
+  
   render() {
     return (
       <View style={styles.container}>
-        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-          <View style={styles.welcomeContainer}>
-            <Image
-              source={
-                __DEV__
-                  ? require('../assets/images/robot-dev.png')
-                  : require('../assets/images/robot-prod.png')
-              }
-              style={styles.welcomeImage}
-            />
-          </View>
 
-          <View style={styles.getStartedContainer}>
-            {this._maybeRenderDevelopmentModeWarning()}
+        <MapView
+          style={styles.map}
+          initialRegion={{
+            latitude: 37.78825,
+            longitude: -122.4324,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
+        />
 
-            <Text style={styles.getStartedText}>Get started by opening</Text>
+        <View style={styles.overMap}>
 
-            <View style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
-              <MonoText style={styles.codeHighlightText}>screens/HomeScreen.js</MonoText>
+          <SwiperFlatList style={styles.thingSlides}>
+            <View style={styles.thingSlide}>
+              <Text onPress={this.goTotThing} style={styles.tabBarInfoText}>This is a tab bar. You can edit it in:</Text>
+              <View style={[styles.codeHighlightContainer, styles.navigationFilename]}>
+                <MonoText style={styles.codeHighlightText}>navigation/MainTabNavigator.js</MonoText>
+              </View>
             </View>
+            <View style={styles.thingSlide}>
+              <Text onPress={this.goTotThing} style={styles.tabBarInfoText}>This is a tab bar. You can edit it in:</Text>
+              <View style={[styles.codeHighlightContainer, styles.navigationFilename]}>
+                <MonoText style={styles.codeHighlightText}>navigation/MainTabNavigator.js</MonoText>
+              </View>
+            </View>
+          </SwiperFlatList>
 
-            <Text style={styles.getStartedText}>
-              Change this text and your app will automatically reload.
-            </Text>
-          </View>
+          <View ref={ref => this.touchable = ref} style={styles.popoverAnchor}></View>
+          <Popover
+            isVisible={this.state.filtersVisible}
+            showInModal={true}
+            fromView={this.touchable}
+            placement="bottom"
+            onClose={() => this.closeFilters()}>
+            <View style={styles.popoverContainer}>
+              <Text style={styles.popoverTitle}>I'm the content of this popover!</Text>
+              <Picker
+              selectedValue={this.state.thingsAvailability}
+              style={styles.popoverPicker}
+              onValueChange={(itemValue, itemIndex) => this.setState({thingsAvailability: itemValue})}>
+              <Picker.Item label="All" value="all" />
+              <Picker.Item label="Everything's there" value="full" />
+              <Picker.Item label="Most still's there" value="medium" />
+              <Picker.Item label="Something's left" value="low" />
+              <Picker.Item label="Everything's gone" value="empty" />
+            </Picker>
+            </View>
+          </Popover>
 
-          <View style={styles.helpContainer}>
-            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
-              <Text style={styles.helpLinkText}>Help, it didn’t automatically reload!</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-
-        <View style={styles.tabBarInfoContainer}>
-          <Text style={styles.tabBarInfoText}>This is a tab bar. You can edit it in:</Text>
-
-          <View style={[styles.codeHighlightContainer, styles.navigationFilename]}>
-            <MonoText style={styles.codeHighlightText}>navigation/MainTabNavigator.js</MonoText>
-          </View>
         </View>
       </View>
+
     );
   }
+
+  goTotThing = () => {
+    this.props.navigation.navigate('Thing', {name: 'Jane'});
+  };
+
+  showFilters = () => {
+    if (this.state.filtersVisible)
+      this.setState({filtersVisible: false});
+    else 
+      this.setState({filtersVisible: true});
+  };
+ 
+  closeFilters = () => {
+    this.setState({filtersVisible: false});
+  };
+
+
+
 
   _maybeRenderDevelopmentModeWarning() {
     if (__DEV__) {
@@ -99,91 +146,3 @@ export default class HomeScreen extends React.Component {
   };
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  developmentModeText: {
-    marginBottom: 20,
-    color: 'rgba(0,0,0,0.4)',
-    fontSize: 14,
-    lineHeight: 19,
-    textAlign: 'center',
-  },
-  contentContainer: {
-    paddingTop: 30,
-  },
-  welcomeContainer: {
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  welcomeImage: {
-    width: 100,
-    height: 80,
-    resizeMode: 'contain',
-    marginTop: 3,
-    marginLeft: -10,
-  },
-  getStartedContainer: {
-    alignItems: 'center',
-    marginHorizontal: 50,
-  },
-  homeScreenFilename: {
-    marginVertical: 7,
-  },
-  codeHighlightText: {
-    color: 'rgba(96,100,109, 0.8)',
-  },
-  codeHighlightContainer: {
-    backgroundColor: 'rgba(0,0,0,0.05)',
-    borderRadius: 3,
-    paddingHorizontal: 4,
-  },
-  getStartedText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    lineHeight: 24,
-    textAlign: 'center',
-  },
-  tabBarInfoContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    ...Platform.select({
-      ios: {
-        shadowColor: 'black',
-        shadowOffset: { height: -3 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-      },
-      android: {
-        elevation: 20,
-      },
-    }),
-    alignItems: 'center',
-    backgroundColor: '#fbfbfb',
-    paddingVertical: 20,
-  },
-  tabBarInfoText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    textAlign: 'center',
-  },
-  navigationFilename: {
-    marginTop: 5,
-  },
-  helpContainer: {
-    marginTop: 15,
-    alignItems: 'center',
-  },
-  helpLink: {
-    paddingVertical: 15,
-  },
-  helpLinkText: {
-    fontSize: 14,
-    color: '#2e78b7',
-  },
-});
