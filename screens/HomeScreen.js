@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, ScrollView, TouchableOpacity, View, PermissionsAndroid, Platform, Text, Picker } from 'react-native';
+import { Image, ScrollView, TouchableOpacity, View, PermissionsAndroid, Platform, Text, Picker, AsyncStorage, Modal } from 'react-native';
 import { Icon, WebBrowser } from 'expo';
 import { Button } from '@shoutem/ui';
 import { StyleProvider } from '@shoutem/theme';
@@ -12,16 +12,34 @@ import { IntroScreen } from '../screens/IntroScreen';
 import styles from './HomeScreen.styles.js';
 
 export default class HomeScreen extends React.Component {
+
+  // set the state values
   state = {
     filtersVisible: false,
-    thingsAvailability: 'all'
+    thingsAvailability: 'all',
+    firstLaunch: false,
+    mapRegion: {
+      latitude: 37.78825,
+      longitude: -122.4324,
+      latitudeDelta: 0.0922,
+      longitudeDelta: 0.0421,
+    },
+    thingsMarkers: []
   }
 
+  // set the header navigator options, with the filter button
   static navigationOptions = ({ navigation }) => {
     const { params = {} } = navigation.state;
     return {
       title: 'Home',
-      //header: null,
+      // headerTitle: (
+      //   <View style={styles.headerLogo}>
+      //     <Image
+      //         source={require('./some/image.png')}
+      //         style={{width:110, height:18}}
+      //     />
+      //   </View>
+      // ),
       headerRight: <Button onPress={params.openFilters} title='filter'>
                     <Icon.MaterialCommunityIcons 
                     name={'filter'} 
@@ -31,23 +49,49 @@ export default class HomeScreen extends React.Component {
     }
   };
 
+  // default function initialized when Screen is loaded
   componentDidMount() {
+    // pass the parameters for the filters
     this.props.navigation.setParams({ openFilters: this.showFilters });
+    
+    // check if is the first time the app is launched (value saved in device storage)
+    AsyncStorage.getItem('alreadyLaunched').then( value => {
+      if (value == null) {
+        this.setState({firstLaunch: true});
+      } else {
+        this.setState({firstLaunch: false});
+      }
+    });
   }
   
   render() {
     return (
       <View style={styles.container}>
 
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={this.state.firstLaunch}
+          onRequestClose={() => {
+            this.introScreenClosed();
+          }}>
+          <InfoScreen />
+        </Modal>
+
         <MapView
           style={styles.map}
-          initialRegion={{
-            latitude: 37.78825,
-            longitude: -122.4324,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-          }}
-        />
+          region={this.state.mapRegion}
+          onRegionChange={this.onRegionChange}>
+
+          {this.state.thingsMarkers.map(marker => (
+            <Marker
+              coordinate={marker.latlng}
+              //onPress={(e) => {e.stopPropagation(); this.onMarkerPress(i)}}
+              //image={require('../assets/pin.png')}
+            />
+          ))}
+          
+        </MapView>
 
         <View style={styles.overMap}>
 
@@ -94,10 +138,39 @@ export default class HomeScreen extends React.Component {
     );
   }
 
+  // function to get the device coordinates
+  deviceCoordinates = () => {
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        this.setState({ mapRegion: {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        } });
+      },
+      error => console.log(error.message),
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+    );
+  };
+
+  // manage map movement event, fetch and reload markers
+  onRegionChange(region) {
+    this.setState({ region });
+  }
+
+  // function called when the intro modal screen is closed, it just save if the storage alreadyLaunched a value and update the state
+  introScreenClosed = () => {
+    AsyncStorage.setItem('alreadyLaunched', 1);
+    this.setState({firstLaunch: false});
+  };  
+
+  // function to open the single Ting screen passing the object content
   goTotThing = () => {
     this.props.navigation.navigate('Thing', {name: 'Jane'});
   };
 
+  // function to open the filters Popover modal (toggle behaviour)
   showFilters = () => {
     if (this.state.filtersVisible)
       this.setState({filtersVisible: false});
@@ -105,44 +178,10 @@ export default class HomeScreen extends React.Component {
       this.setState({filtersVisible: true});
   };
  
+  // function to close the filter Popover modal
   closeFilters = () => {
     this.setState({filtersVisible: false});
   };
 
-
-
-
-  _maybeRenderDevelopmentModeWarning() {
-    if (__DEV__) {
-      const learnMoreButton = (
-        <Text onPress={this._handleLearnMorePress} style={styles.helpLinkText}>
-          Learn more
-        </Text>
-      );
-
-      return (
-        <Text style={styles.developmentModeText}>
-          Development mode is enabled, your app will be slower but you can use useful development
-          tools. {learnMoreButton}
-        </Text>
-      );
-    } else {
-      return (
-        <Text style={styles.developmentModeText}>
-          You are not in development mode, your app will run at full speed.
-        </Text>
-      );
-    }
-  }
-
-  _handleLearnMorePress = () => {
-    WebBrowser.openBrowserAsync('https://docs.expo.io/versions/latest/guides/development-mode');
-  };
-
-  _handleHelpPress = () => {
-    WebBrowser.openBrowserAsync(
-      'https://docs.expo.io/versions/latest/guides/up-and-running.html#can-t-see-your-changes'
-    );
-  };
 }
 

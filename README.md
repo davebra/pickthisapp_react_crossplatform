@@ -8,6 +8,9 @@ PickThisApp React Native, Final Assignment project for the Cross Platform subjec
 
 ### Extensions, Libraries and Components
 
+* React Native
+* Expo
+* react-native-dotenv (environment management)
 * Shoutem UI toolkit (ui/theme/animation)
 * react-native-oauth (OAuth login library)
 * react-navigation 

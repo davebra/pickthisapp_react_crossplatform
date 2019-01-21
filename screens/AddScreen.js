@@ -1,6 +1,5 @@
 import React from 'react';
-import { ScrollView } from 'react-native';
-import { ExpoConfigView } from '@expo/samples';
+import { StyleSheet, ScrollView } from 'react-native';
 
 export default class AddScreen extends React.Component {
   static navigationOptions = {
@@ -9,8 +8,15 @@ export default class AddScreen extends React.Component {
 
   render() {
     return (
-      <ExpoConfigView />
+      <ScrollView style={styles.container}>
+      </ScrollView>
     );
   }
 }
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+});
