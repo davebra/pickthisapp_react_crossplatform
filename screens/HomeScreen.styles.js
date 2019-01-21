@@ -19,9 +19,6 @@ export default StyleSheet.create({
   map: {
     ...StyleSheet.absoluteFill,
   },
-  overMap: {
-    ...StyleSheet.absoluteFill,
-  },
   developmentModeText: {
     position: 'absolute',
     bottom: 60,
