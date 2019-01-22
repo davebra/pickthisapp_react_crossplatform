@@ -3,16 +3,6 @@ import {StyleSheet, Dimensions, View, Text, Image, Button, AsyncStorage } from '
 import SwiperFlatList from 'react-native-swiper-flatlist';
 
 export default class IntroScreen extends React.Component {
-  // default function initialized when Screen is loaded
-  componentDidMount() {
-    // check if is the first time the app is launched (value saved in device storage)
-    AsyncStorage.getItem('alreadyLaunched').then( value => {
-      if (value) {
-        // open the Home
-        this.props.navigation.navigate('HomeStack');
-      }
-    });
-  }
 
   render() {
     return (
@@ -40,9 +30,10 @@ export default class IntroScreen extends React.Component {
 
   // function called when the intro modal screen is closed, it just save if the storage alreadyLaunched a value and update the state
   closeIntro = () => {
+    // save 'yes' in the storage key 'alreadyLaunched'
     AsyncStorage.setItem('alreadyLaunched', 'yes');
-    // open the Home
-    this.props.navigation.navigate('HomeStack');
+    // back to the Home Screen
+    this.props.navigation.goBack();
   };  
 
 }

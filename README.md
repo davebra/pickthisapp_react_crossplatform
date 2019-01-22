@@ -12,12 +12,13 @@ PickThisApp React Native, Final Assignment project for the Cross Platform subjec
 * Expo
 * react-native-dotenv (environment management)
 * Shoutem UI toolkit (ui/theme/animation)
-* react-native-oauth (OAuth login library)
-* react-navigation 
-* react-native-maps
-* react-navigation-popover
-* react-native-popover-view
-* react-native-swiper-flatlist
+* react-navigation (default top and bottom tab navigations)
+* react-native-maps (map for Home and Add screens)
+* react-navigation-popover (to enable popovers in navigation for Home screen)
+* react-native-popover-view (to shows filters in Home screen)
+* react-native-swiper-flatlist (to shows the swipe of views in Home screen)
+* react-native-swipe-list-view (to have a list with left/right swipe in My screen)
+* react-native-image-picker (to have the picker with open album or open camera in Add screen)
 
 #### Extra Infos
 

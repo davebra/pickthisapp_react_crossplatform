@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Text, TouchableHighlight, Icon } from 'react-native';
+import { StyleSheet, View, Text, TouchableHighlight, Icon, AsyncStorage } from 'react-native';
 import Expo from 'expo';
 import { ANDROID_AUTH_CLIENT_ID, IOS_AUTH_CLIENT_ID, ANDROID_STANDALONE_AUTH_CLIENT_ID, IOS_STANDALONE_AUTH_CLIENT_ID } from 'react-native-dotenv';
 
@@ -8,23 +8,21 @@ export default class LoginScreen extends React.Component {
     userInfo: null,
     userLogged: false,
     chooseNickname: false,
-    userNickname: null,
+    userData: {},
   };
 
-  static navigationOptions = {
-    title: 'Join PickThisApp',
-  };
-
-  // default function initialized when Screen is loaded
+  // execute immediatly after Login Screen is mounted
   componentDidMount() {
-    // check if is the first time the app is launched (value saved in device storage)
-    AsyncStorage.getItem('userNickname').then( value => {
+
+    // check if is the user is already logged in
+    AsyncStorage.getItem('userToken').then( value => {
       if (value == null) {
-        this.setState({userLogged: false});
+        this.setState({ userLogged: false });
       } else {
-        this.setState({userNickname: value});
+        this.setState({ userToken: parseJwt(token) });
       }
     });
+
   }
 
   render() {
@@ -48,7 +46,7 @@ export default class LoginScreen extends React.Component {
             </View>
           ) : (
             <View>
-              <Text style={styles.loginTitle}>Hey {this.userNickname}!</Text>
+              <Text style={styles.loginTitle}>Hey {this.userToken.nickname}!</Text>
               <TouchableHighlight style={styles.logoutTouchable} onPress={this.executeLogout}>
                 <Text style={styles.logoutTitle}>Want to Logout?</Text>
               </TouchableHighlight>
@@ -106,6 +104,12 @@ export default class LoginScreen extends React.Component {
       console.log(`Facebook Login Error: ${message}`);
     }
   }
+
+  parseJwt(token) {
+		var base64Url = token.split('.')[1];
+		var base64 = base64Url.replace('-', '+').replace('_', '/');
+		return JSON.parse(window.atob(base64));
+  };
 
 }
 

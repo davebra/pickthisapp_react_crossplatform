@@ -1,25 +1,24 @@
 import React from 'react';
-import { Image, ScrollView, TouchableOpacity, View, PermissionsAndroid, Platform, Text, Picker, AsyncStorage } from 'react-native';
-import { Icon, WebBrowser } from 'expo';
+import { Image, TouchableOpacity, View, PermissionsAndroid, Platform, Text, Picker, AsyncStorage } from 'react-native';
+import { Icon } from 'expo';
 import { Button } from '@shoutem/ui';
 import MapView, { Marker, ProviderPropType } from 'react-native-maps';
 import Popover from 'react-native-popover-view';
 import SwiperFlatList from 'react-native-swiper-flatlist';
+import { S3_BUCKET_URL } from 'react-native-dotenv';
 
-import { MonoText } from '../components/StyledText';
+import { TagText } from '../components/TagText';
 import styles from './HomeScreen.styles.js';
 
 export default class HomeScreen extends React.Component {
-
-  // set the state values
   state = {
     filtersVisible: false,
     thingsAvailability: 'all',
-    mapRegion: {
+    mapRegion: { // starting map region = melbourne
       latitude: -37.814,
       longitude: 144.96332,
-      latitudeDelta: 0.15,
-      longitudeDelta: 0.15,
+      latitudeDelta: 0.2,
+      longitudeDelta: 0.2,
     },
     showSwiper: false,
     thingsMarkers: [
@@ -225,8 +224,16 @@ export default class HomeScreen extends React.Component {
     }
   };
 
-  // default function initialized when Screen is loaded
+  // execute immediatly after Home Screen is mounted
   componentDidMount() {
+
+    // check if is the first time the app is launched
+    AsyncStorage.getItem('alreadyLaunched').then( value => {
+        if (value == null) {
+          this.props.navigation.navigate('Intro');
+        }
+    });
+    
     // pass the parameters for the filters
     this.props.navigation.setParams({ openFilters: this.showFilters });
   }
@@ -236,14 +243,13 @@ export default class HomeScreen extends React.Component {
       <View style={styles.container}>
 
         <MapView
-          ref={MapView => (this.MapView = MapView)}
+          ref="map"
           style={styles.map}
           region={this.state.mapRegion}
           loadingEnabled = {true}
           loadingIndicatorColor="#666666"
           loadingBackgroundColor="#eeeeee"
           showsUserLocation={true}
-          moveOnMarkerPress={true}
           showsPointsOfInterest={false}
           //provider="google"
           //onRegionChange={this.onRegionChange}
@@ -256,19 +262,31 @@ export default class HomeScreen extends React.Component {
                 latitude: parseFloat(marker.location.coordinates[1]),
                 longitude: parseFloat(marker.location.coordinates[0]),
               }}
-              onPress={(e) => {e.stopPropagation(); this.onMarkerPress(i)}}
+              onPress={(e) => {
+                  e.stopPropagation(); 
+                  this.onMarkerPress(i, marker.location.coordinates[1], marker.location.coordinates[0])
+                }}
               //image={require('../assets/pin.png')}
             />
           ))}
           
         </MapView>
 
-        <SwiperFlatList style={this.state.showSwiper ? styles.thingSlides : {display: 'none'}} ref='swiper'>
+        <SwiperFlatList 
+        style={this.state.showSwiper ? styles.thingSlides : {display: 'none'}} 
+        ref='swiper'
+        onMomentumScrollEnd={this.onSlideSwiper} >
           {this.state.thingsMarkers.map( (marker, i) => (
             <View key={i} style={styles.thingSlide}>
-              <Text onPress={this.goTotThing} style={styles.tabBarInfoText}>This is a tab bar. You can edit it in:</Text>
-              <View style={[styles.codeHighlightContainer, styles.navigationFilename]}>
-                <MonoText style={styles.codeHighlightText}>navigation/MainTabNavigator.js</MonoText>
+              <Image
+                style={styles.thingSlideImage}
+                source={{uri: `${S3_BUCKET_URL}/${marker.images[0]}`}}
+              />
+              <Text onPress={this.goTotThing} style={styles.thingSlideText}>Here there are: </Text>
+              <View style={[styles.tagsContainer]}>
+                {marker.tags.map( (tag, j) => (
+                <TagText key={j}>{tag}</TagText>
+                ))}
               </View>
             </View>
           ))}         
@@ -305,27 +323,43 @@ export default class HomeScreen extends React.Component {
   deviceCoordinates = () => {
     navigator.geolocation.getCurrentPosition(
       position => {
-        this.setState({ mapRegion: {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-        } });
+        this.refs.map.animateToRegion({
+            latitude: position.coords.latitude, 
+            longitude: position.coords.longitude, 
+            latitudeDelta: 0.1, 
+            longitudeDelta: 0.1
+        }, 1000);
       },
       error => console.log(error.message),
       { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
     );
   };
 
-  // manage map movement event, fetch and reload markers
-  onMarkerPress = (i) => {
+  // manage marker click, select SwipeSlide and center map to marker
+  onMarkerPress = (i, latitude, longitude) => {
     this.setState({showSwiper: true});
     this.refs.swiper._scrollToIndex(i);
+    this.refs.map.animateToRegion({
+        latitude, 
+        longitude, 
+        latitudeDelta: 0.09, 
+        longitudeDelta: 0.09
+    }, 600);
+  }
+
+  // manage SwipeSlide movement, center map to marker
+  onSlideSwiper = (i) => {
+    this.refs.map.animateToRegion({
+        latitude: this.thingsMarkers[i].location.coordinates[1], 
+        longitude: this.thingsMarkers[i].location.coordinates[0], 
+        latitudeDelta: 0.09, 
+        longitudeDelta: 0.09
+    }, 500);
   }
 
   // manage map movement event, fetch and reload markers
   onRegionChange = (mapRegion) => {
-    this.setState({ mapRegion });
+
   }
 
   // function to open the single Ting screen passing the object content

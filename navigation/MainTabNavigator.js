@@ -8,29 +8,17 @@ import ThingScreen from '../screens/ThingScreen';
 import AddScreen from '../screens/AddScreen';
 import MyScreen from '../screens/MyScreen';
 import IntroScreen from '../screens/IntroScreen';
+import LoginScreen from '../screens/LoginScreen';
 
 const HomeThingStack = createStackNavigator({
   Home: HomeScreen,
   Thing: ThingScreen,
 });
 
-const HomeIntroStack = createStackNavigator(
-  {
-    Home: HomeScreen,
-    Intro: IntroScreen,
-  },
-  {
-    mode: 'modal',
-  }
-);
-
 const HomeStack = createSwitchNavigator(
   {
-    Intro: IntroScreen,
     HomeStack: HomeThingStack,
-  },
-  {
-    initialRouteName: 'Intro',
+    Intro: IntroScreen,
   }
 );
 
@@ -55,11 +43,14 @@ HomeStack.navigationOptions = ({navigation})=>{
   return navigationOptions;
 };
 
-const AddStack = createStackNavigator({
-  Add: AddScreen,
-});
+const AddAuthStack = createSwitchNavigator(
+  {
+    Add: AddScreen,
+    Login: LoginScreen,
+  }
+);
 
-AddStack.navigationOptions = {
+AddAuthStack.navigationOptions = {
   tabBarLabel: 'Add Thing',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
@@ -69,11 +60,19 @@ AddStack.navigationOptions = {
   ),
 };
 
-const MyStack = createStackNavigator({
+const MyThingStack = createStackNavigator({
   My: MyScreen,
+  Thing: ThingScreen,
 });
 
-MyStack.navigationOptions = {
+const MyAuthStack = createSwitchNavigator(
+  {
+    MyStack: MyThingStack,
+    Login: LoginScreen,
+  }
+);
+
+MyAuthStack.navigationOptions = {
   tabBarLabel: 'My Things',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
@@ -85,6 +84,6 @@ MyStack.navigationOptions = {
 
 export default createBottomTabNavigator({
   HomeStack,
-  AddStack,
-  MyStack,
+  AddAuthStack,
+  MyAuthStack,
 });
