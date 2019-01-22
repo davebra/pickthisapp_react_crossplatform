@@ -33,7 +33,7 @@ export default class IntroScreen extends React.Component {
     // save 'yes' in the storage key 'alreadyLaunched'
     AsyncStorage.setItem('alreadyLaunched', 'yes');
     // back to the Home Screen
-    this.props.navigation.goBack();
+    this.props.navigation.navgate('HomeStack');
   };  
 
 }

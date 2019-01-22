@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, ScrollView } from 'react-native';
+import { StyleSheet, ScrollView, AsyncStorage } from 'react-native';
 import ImagePicker from 'react-native-image-picker';
 
 export default class AddScreen extends React.Component {

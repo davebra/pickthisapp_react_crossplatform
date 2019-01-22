@@ -12,14 +12,9 @@ import styles from './HomeScreen.styles.js';
 
 export default class HomeScreen extends React.Component {
   state = {
+    userLocationFound: false,
     filtersVisible: false,
     thingsAvailability: 'all',
-    mapRegion: { // starting map region = melbourne
-      latitude: -37.814,
-      longitude: 144.96332,
-      latitudeDelta: 0.2,
-      longitudeDelta: 0.2,
-    },
     showSwiper: false,
     thingsMarkers: [
       {
@@ -202,6 +197,9 @@ export default class HomeScreen extends React.Component {
   ]
   }
 
+  // property that I need to move or not the map when marker is clicked
+  moveTheMap = true;
+
   // set the header navigator options, with the filter button
   static navigationOptions = ({ navigation }) => {
     const { params = {} } = navigation.state;
@@ -236,6 +234,9 @@ export default class HomeScreen extends React.Component {
     
     // pass the parameters for the filters
     this.props.navigation.setParams({ openFilters: this.showFilters });
+
+    // load user location
+    this.getUserLocation();
   }
   
   render() {
@@ -245,14 +246,19 @@ export default class HomeScreen extends React.Component {
         <MapView
           ref="map"
           style={styles.map}
-          region={this.state.mapRegion}
-          loadingEnabled = {true}
+          initialRegion={{ // starting map region = melbourne
+            latitude: -37.8177025,
+            longitude: 144.9633281,
+            latitudeDelta: 0.2,
+            longitudeDelta: 0.2,
+          }}
+          loadingEnabled={true}
           loadingIndicatorColor="#666666"
           loadingBackgroundColor="#eeeeee"
-          showsUserLocation={true}
+          showsUserLocation={this.state.userLocationFound}
           showsPointsOfInterest={false}
-          //provider="google"
-          //onRegionChange={this.onRegionChange}
+          onPress={this.onMapPress}
+          onRegionChangeComplete={this.onRegionChangeComplete}
           >
 
           {this.state.thingsMarkers.map( (marker, i) => (
@@ -264,7 +270,7 @@ export default class HomeScreen extends React.Component {
               }}
               onPress={(e) => {
                   e.stopPropagation(); 
-                  this.onMarkerPress(i, marker.location.coordinates[1], marker.location.coordinates[0])
+                  this.onMarkerPress(i)
                 }}
               //image={require('../assets/pin.png')}
             />
@@ -319,47 +325,56 @@ export default class HomeScreen extends React.Component {
     );
   }
 
-  // function to get the device coordinates
-  deviceCoordinates = () => {
+  // function executed when the location of the user has been found by MapView
+  getUserLocation = () => {
     navigator.geolocation.getCurrentPosition(
-      position => {
-        this.refs.map.animateToRegion({
-            latitude: position.coords.latitude, 
-            longitude: position.coords.longitude, 
-            latitudeDelta: 0.1, 
-            longitudeDelta: 0.1
-        }, 1000);
-      },
-      error => console.log(error.message),
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+        position => {
+            this.setState({userLocationFound: true});
+            this.refs.map.animateToRegion({
+                latitude: position.coords.latitude, 
+                longitude: position.coords.longitude, 
+                latitudeDelta: 0.1, 
+                longitudeDelta: 0.1
+            }, 600);
+        },
+        error => Alert.alert(error.message),
+        { enableHighAccuracy: false, timeout: 20000, maximumAge: 1000 }
     );
   };
 
   // manage marker click, select SwipeSlide and center map to marker
-  onMarkerPress = (i, latitude, longitude) => {
-    this.setState({showSwiper: true});
+  onMarkerPress = (i) => {
+    // do not move the map if marker is clicked
+    moveTheMap = false; 
+    // if not visible, show the Swiper
+    if(!this.state.showSwiper) this.setState({showSwiper: true});
+    // scroll the Swiper to the right thing
     this.refs.swiper._scrollToIndex(i);
-    this.refs.map.animateToRegion({
-        latitude, 
-        longitude, 
-        latitudeDelta: 0.09, 
-        longitudeDelta: 0.09
-    }, 600);
   }
 
   // manage SwipeSlide movement, center map to marker
   onSlideSwiper = (i) => {
-    this.refs.map.animateToRegion({
-        latitude: this.thingsMarkers[i].location.coordinates[1], 
-        longitude: this.thingsMarkers[i].location.coordinates[0], 
-        latitudeDelta: 0.09, 
-        longitudeDelta: 0.09
-    }, 500);
+    // if marker is clicked, this will be false, so don't move the map
+    if(moveTheMap){
+        this.refs.map.animateToRegion({
+            latitude: this.state.thingsMarkers[i.index].location.coordinates[1], 
+            longitude: this.state.thingsMarkers[i.index].location.coordinates[0], 
+            latitudeDelta: 0.09, 
+            longitudeDelta: 0.09
+        }, 500);
+    }
+    // set back the move map to true
+    moveTheMap = true;
+  }
+
+  // manage map click not on a marker
+  onMapPress = () => {
+    if(this.state.showSwiper) this.setState({showSwiper: false});    
   }
 
   // manage map movement event, fetch and reload markers
-  onRegionChange = (mapRegion) => {
-
+  onRegionChangeComplete = (region) => {
+      console.log(region);
   }
 
   // function to open the single Ting screen passing the object content

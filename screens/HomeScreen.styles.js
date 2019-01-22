@@ -84,7 +84,7 @@ export default StyleSheet.create({
   },
   tagsContainer: {
     marginTop: 15,
-    alignItems: 'left',
+    alignItems: 'flex-start',
   },
 });
   
