@@ -1,44 +1,52 @@
 import { AsyncStorage } from 'react-native';
 import { RESTAPI_URL, S3_BUCKET_URL } from 'react-native-dotenv';
 
-async function getThings(latitude, longitude, radius) {
-    try {
-        let response = await fetch(`${RESTAPI_URL}/things?lat=${latitude}&lng=${longitude}&radius=${radius}`);
-        let responseJson = await response.json();
-        return responseJson;
-    } catch (error) {
-        console.error(error);
-    }
+export async function getThings(latitude, longitude, radius) {
+    return new Promise((resolve, reject) => {
+        fetch(`${RESTAPI_URL}/things?lat=${latitude}&lng=${longitude}&radius=${radius}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        })
+        .then((resp) => {
+            return resp.json();
+        })
+        .then((resp) => {
+            resolve(resp);
+        });
+    });
 }
 
-async function loginUser(provider, providerid) {
-    try {
-        let response = await fetch(`${RESTAPI_URL}/login`,
-        {
+export async function loginUser(provider, providerid) {
+    return new Promise((resolve, reject) => {
+        fetch(`${RESTAPI_URL}/login`, {
             method: 'POST',
             headers: {
-                Accept: 'application/json',
+                'Accept': 'application/json',
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
                 provider,
                 providerid,
             }),
+        })
+        .then((resp) => {
+            return resp.json();
+        })
+        .then((resp) => {
+            resolve(resp);
         });
-        let responseJson = await response.json();
-        return responseJson;
-    } catch (error) {
-        console.error(error);
-    }
+    });
 }
 
-async function signupUser(provider, providerid, nickname) {
-    try {
-        let response = await fetch(`${RESTAPI_URL}/signup`,
-        {
+export async function signupUser(provider, providerid, nickname) {
+    return new Promise((resolve, reject) => {
+        fetch(`${RESTAPI_URL}/signup`, {
             method: 'POST',
             headers: {
-                Accept: 'application/json',
+                'Accept': 'application/json',
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
@@ -46,107 +54,118 @@ async function signupUser(provider, providerid, nickname) {
                 providerid,
                 nickname
             }),
+        })
+        .then((resp) => {
+            return resp.json();
+        })
+        .then((resp) => {
+            resolve(resp);
         });
-        let responseJson = await response.json();
-        return responseJson;
-    } catch (error) {
-        console.error(error);
-    }
+    });
 }
 
-async function getUserThings(userid) {
+export async function getUserThings(userid) {
     const token = await AsyncStorage.getItem('userToken');
-    try {
-        let response = await fetch(`${RESTAPI_URL}/user/${userid}/things/`,
-        {
+    return new Promise((resolve, reject) => {
+        fetch(`${RESTAPI_URL}/user/${userid}/things/`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
-                Accept: 'application/json',
+                'Accept': 'application/json',
                 'Content-Type': 'application/json',
             },
+            body: JSON.stringify({
+                provider,
+                providerid,
+                nickname
+            }),
+        })
+        .then((resp) => {
+            return resp.json();
+        })
+        .then((resp) => {
+            resolve(resp);
         });
-        let responseJson = await response.json();
-        return responseJson;
-    } catch (error) {
-        console.error(error);
-    }
+    });
 }
 
-async function changeThingStatus(thingid, status) {
+export async function changeThingStatus(thingid, status) {
     const token = await AsyncStorage.getItem('userToken');
-    try {
-        let response = await fetch(`${RESTAPI_URL}/things/${thingid}`,
-        {
+    return new Promise((resolve, reject) => {
+        fetch(`${RESTAPI_URL}/things/${thingid}`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
-                Accept: 'application/json',
+                'Accept': 'application/json',
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
                 status
             }),
+        })
+        .then((resp) => {
+            return resp.json();
+        })
+        .then((resp) => {
+            resolve(resp);
         });
-        let responseJson = await response.json();
-        return responseJson;
-    } catch (error) {
-        console.error(error);
-    }
+    });
 }
 
-async function changeThingAvailability(thingid, availability) {
+export async function changeThingAvailability(thingid, availability) {
     const token = await AsyncStorage.getItem('userToken');
-    try {
-        let response = await fetch(`${RESTAPI_URL}/things/${thingid}`,
-        {
+    return new Promise((resolve, reject) => {
+        fetch(`${RESTAPI_URL}/things/${thingid}`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
-                Accept: 'application/json',
+                'Accept': 'application/json',
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
                 availability
             }),
+        })
+        .then((resp) => {
+            return resp.json();
+        })
+        .then((resp) => {
+            resolve(resp);
         });
-        let responseJson = await response.json();
-        return responseJson;
-    } catch (error) {
-        console.error(error);
-    }
+    });
 }
 
-async function uploadImage(image) {
+export async function uploadImage(image) {
     const token = await AsyncStorage.getItem('userToken');
     const formData = new FormData();
     formData.append('file', image);
-    try {
-        let response = await fetch(`${RESTAPI_URL}/upload`,
-        {
+
+    return new Promise((resolve, reject) => {
+        fetch(`${RESTAPI_URL}/things/${thingid}`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'multipart/form-data',
             },
             body: formData,
+        })
+        .then((resp) => {
+            return resp.json();
+        })
+        .then((resp) => {
+            resolve(resp);
         });
-        let responseJson = await response.json();
-        return responseJson;
-    } catch (error) {
-        console.error(error);
-    }
+    });
 }
 
-async function addThings(type, lat, lng, tags, images) {
+export async function addThings(type, lat, lng, tags, images) {
     const token = await AsyncStorage.getItem('userToken');
-    try {
-        let response = await fetch(`${RESTAPI_URL}/things`,
-        {
+    return new Promise((resolve, reject) => {
+        fetch(`${RESTAPI_URL}/things`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
-                Accept: 'application/json',
+                'Accept': 'application/json',
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
@@ -156,21 +175,13 @@ async function addThings(type, lat, lng, tags, images) {
                 tags,
                 images
             }),
+        })
+        .then((resp) => {
+            return resp.json();
+        })
+        .then((resp) => {
+            resolve(resp);
         });
-        let responseJson = await response.json();
-        return responseJson;
-    } catch (error) {
-        console.error(error);
-    }
+    });
 }
 
-export default {
-    getThings,
-    loginUser,
-    signupUser,
-    getUserThings,
-    changeThingStatus,
-    changeThingAvailability,
-    uploadImage,
-    addThings
-};

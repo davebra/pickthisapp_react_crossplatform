@@ -70,12 +70,17 @@ export default StyleSheet.create({
         elevation: 20,
       },
     }),
-    alignItems: 'center',
     backgroundColor: '#fbfbfb',
   },
+  thingSlideContainer: {
+    flexDirection: 'row'
+  },
   thingSlideImage: {
-    width: 50,
-    height: 50,    
+    width: height * 0.2 - 32,
+    height: height * 0.2 - 32,    
+  },
+  thingSlideRight: {
+    flexDirection: 'column'    
   },
   thingSlideText: {
     fontSize: 17,
@@ -83,8 +88,7 @@ export default StyleSheet.create({
     textAlign: 'center',
   },
   tagsContainer: {
-    marginTop: 15,
-    alignItems: 'flex-start',
+    flexDirection: 'row'    
   },
 });
   

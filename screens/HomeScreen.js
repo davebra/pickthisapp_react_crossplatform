@@ -9,6 +9,7 @@ import { S3_BUCKET_URL } from 'react-native-dotenv';
 
 import { TagText } from '../components/TagText';
 import styles from './HomeScreen.styles.js';
+import { getThings } from '../components/RestApi';
 
 export default class HomeScreen extends React.Component {
   state = {
@@ -16,189 +17,8 @@ export default class HomeScreen extends React.Component {
     filtersVisible: false,
     thingsAvailability: 'all',
     showSwiper: false,
-    thingsMarkers: [
-      {
-          "location": {
-              "coordinates": [
-                  144.945056,
-                  -37.808671
-              ],
-              "type": "Point"
-          },
-          "tags": [
-              "bed",
-              "bedframe"
-          ],
-          "images": [
-              "test2_1.jpg",
-              "test2_2.jpg"
-          ],
-          "_id": "f76a20c0-08d3-11e9-83b0-3987791c7c1a",
-          "timestamp": "2018-12-26T06:03:29.355Z",
-          "updates": [
-              {
-                  "timestamp": "2018-12-26T06:03:29.355Z",
-                  "_id": "5c2319b1260bf201daf73fb9",
-                  "user": "1e6a8e52-bdca-57eb-accb-d02ee2c18a42",
-                  "what": "create"
-              }
-          ],
-          "availability": "full",
-          "status": "live",
-          "type": "pick",
-          "user": "1e6a8e52-bdca-57eb-accb-d02ee2c18a42",
-          "__v": 0
-      },
-      {
-          "location": {
-              "coordinates": [
-                  144.97845,
-                  -37.807177
-              ],
-              "type": "Point"
-          },
-          "tags": [
-              "table",
-              "chairs"
-          ],
-          "images": [
-              "test1_1.jpg",
-              "test1_2.jpg",
-              "test1_3.jpg"
-          ],
-          "_id": "17d1a470-098b-11e9-965c-0f83ff5f6506",
-          "timestamp": "2018-12-27T03:54:21.622Z",
-          "updates": [
-              {
-                  "timestamp": "2018-12-27T03:54:21.622Z",
-                  "_id": "5c244ced73820500242640fa",
-                  "user": "1e6a8e52-bdca-57eb-accb-d02ee2c18a42",
-                  "what": "create"
-              },
-              {
-                  "timestamp": "2018-12-31T03:20:16.557Z",
-                  "_id": "5c298af011843300245b23e7",
-                  "user": "1e6a8e52-bdca-57eb-accb-d02ee2c18a42",
-                  "what": "updated"
-              }
-          ],
-          "availability": "medium",
-          "status": "live",
-          "type": "pick",
-          "user": "1e6a8e52-bdca-57eb-accb-d02ee2c18a42",
-          "__v": 1
-      },
-      {
-          "location": {
-              "coordinates": [
-                  144.98747910505682,
-                  -37.80381913512071
-              ],
-              "type": "Point"
-          },
-          "tags": [
-              "crates milk",
-              "crate"
-          ],
-          "images": [
-              "396b92494ec307922b1f28b388b994eb.jpg"
-          ],
-          "_id": "51b49280-1492-11e9-b763-4b2aca3d0b23",
-          "timestamp": "2019-01-10T04:43:48.007Z",
-          "updates": [
-              {
-                  "timestamp": "2019-01-10T04:43:48.011Z",
-                  "_id": "5c36cd84af497f0024a76436",
-                  "user": "ac386ca1-9743-5aae-8b17-2d5f1cd5a61f",
-                  "what": "create"
-              }
-          ],
-          "availability": "full",
-          "status": "live",
-          "type": "pick",
-          "user": "ac386ca1-9743-5aae-8b17-2d5f1cd5a61f",
-          "__v": 0
-      },
-      {
-          "location": {
-              "coordinates": [
-                  144.950379,
-                  -37.845283
-              ],
-              "type": "Point"
-          },
-          "tags": [
-              "bed",
-              "bedframe"
-          ],
-          "images": [
-              "test1_3.jpg",
-              "test2_2.jpg"
-          ],
-          "_id": "04e19620-0974-11e9-b6ec-4be1b09a8f2c",
-          "timestamp": "2018-12-27T01:09:11.425Z",
-          "updates": [
-              {
-                  "timestamp": "2018-12-27T01:09:11.425Z",
-                  "_id": "5c24263762201518e652e69a",
-                  "user": "08e5b1b5-9293-5fc1-8c47-44782c476b61",
-                  "what": "create"
-              },
-              {
-                  "timestamp": "2019-01-10T06:34:11.522Z",
-                  "_id": "5c36e763af497f0024a76437",
-                  "user": "ac386ca1-9743-5aae-8b17-2d5f1cd5a61f",
-                  "what": "updated status(paused)"
-              },
-              {
-                  "timestamp": "2019-01-10T06:34:15.858Z",
-                  "_id": "5c36e767af497f0024a76438",
-                  "user": "ac386ca1-9743-5aae-8b17-2d5f1cd5a61f",
-                  "what": "updated status(live)"
-              }
-          ],
-          "availability": "low",
-          "status": "live",
-          "type": "pick",
-          "user": "ac386ca1-9743-5aae-8b17-2d5f1cd5a61f",
-          "__v": 2
-      },
-      {
-          "location": {
-              "coordinates": [
-                  144.997901,
-                  -37.84895
-              ],
-              "type": "Point"
-          },
-          "tags": [
-              "table",
-              "chairs"
-          ],
-          "images": [
-              "test3.jpg"
-          ],
-          "_id": "8c97f4e0-0985-11e9-98c5-8f3656c93f54",
-          "timestamp": "2018-12-27T03:14:40.558Z",
-          "updates": [
-              {
-                  "timestamp": "2018-12-27T03:14:40.558Z",
-                  "_id": "5c2443a06e0a0c2bdb0d8cbf",
-                  "user": "1e6a8e52-bdca-57eb-accb-d02ee2c18a42",
-                  "what": "create"
-              }
-          ],
-          "availability": "full",
-          "status": "live",
-          "type": "pick",
-          "user": "ac386ca1-9743-5aae-8b17-2d5f1cd5a61f",
-          "__v": 0
-      }
-  ]
+    thingsMarkers: []
   }
-
-  // property that I need to move or not the map when marker is clicked
-  moveTheMap = true;
 
   // set the header navigator options, with the filter button
   static navigationOptions = ({ navigation }) => {
@@ -224,6 +44,11 @@ export default class HomeScreen extends React.Component {
 
   // execute immediatly after Home Screen is mounted
   componentDidMount() {
+
+    // property that I need to update the states only when I want
+    moveTheMap = true;
+    loadNewThings = true;
+    downloadedThings = [];
 
     // check if is the first time the app is launched
     AsyncStorage.getItem('alreadyLaunched').then( value => {
@@ -284,16 +109,30 @@ export default class HomeScreen extends React.Component {
         onMomentumScrollEnd={this.onSlideSwiper} >
           {this.state.thingsMarkers.map( (marker, i) => (
             <View key={i} style={styles.thingSlide}>
-              <Image
-                style={styles.thingSlideImage}
-                source={{uri: `${S3_BUCKET_URL}/${marker.images[0]}`}}
-              />
-              <Text onPress={this.goTotThing} style={styles.thingSlideText}>Here there are: </Text>
-              <View style={[styles.tagsContainer]}>
-                {marker.tags.map( (tag, j) => (
-                <TagText key={j}>{tag}</TagText>
-                ))}
-              </View>
+                <TouchableOpacity onPress={() => { this.goTotThing(i) }}>
+                    <View style={styles.thingSlideContainer}>
+                    <Image
+                        style={styles.thingSlideImage}
+                        source={{uri: `${S3_BUCKET_URL}${marker.images[0]}`}}
+                    />
+                    <View style={[styles.thingSlideRight]}>
+                        <Text style={styles.thingSlideText}>Here there are: {marker._id}</Text>
+                        <View style={[styles.tagsContainer]}>
+                            {marker.tags.map( (tag, j) => (
+                            <TagText key={j}>{tag}</TagText>
+                            ))}
+                        </View>
+                        <Text>Availability: 
+                            {{
+                                ['full']: `Great!`,
+                                ['medium']: `Good`,
+                                ['low']: `Something's left`,
+                                ['empty']: `Gone`,
+                            }[marker.availability]}
+                        </Text>
+                    </View>
+                    </View>
+                </TouchableOpacity>
             </View>
           ))}         
         </SwiperFlatList>
@@ -336,6 +175,7 @@ export default class HomeScreen extends React.Component {
                 latitudeDelta: 0.1, 
                 longitudeDelta: 0.1
             }, 600);
+            loadNewThings = true;
         },
         error => Alert.alert(error.message),
         { enableHighAccuracy: false, timeout: 20000, maximumAge: 1000 }
@@ -350,6 +190,7 @@ export default class HomeScreen extends React.Component {
     if(!this.state.showSwiper) this.setState({showSwiper: true});
     // scroll the Swiper to the right thing
     this.refs.swiper._scrollToIndex(i);
+    loadNewThings = false;
   }
 
   // manage SwipeSlide movement, center map to marker
@@ -363,23 +204,63 @@ export default class HomeScreen extends React.Component {
             longitudeDelta: 0.09
         }, 500);
     }
+
+    loadNewThings = false;
+
     // set back the move map to true
     moveTheMap = true;
   }
 
   // manage map click not on a marker
   onMapPress = () => {
+    loadNewThings = false;
     if(this.state.showSwiper) this.setState({showSwiper: false});    
   }
 
   // manage map movement event, fetch and reload markers
   onRegionChangeComplete = (region) => {
-      console.log(region);
+    if(loadNewThings){
+      getThings(
+        region.latitude, 
+        region.longitude, 
+        this.calculateDistance(
+            region.latitude - region.latitudeDelta,
+            region.longitude - region.longitudeDelta,
+            region.latitude + region.latitudeDelta,
+            region.longitude + region.longitudeDelta
+        )
+        ).then(res => { 
+            if( Array.isArray(res) ){
+                let newThings = [];
+                res.forEach(thing => {
+                    if (!downloadedThings.includes(thing._id)) {
+                        newThings.push(thing);
+                        downloadedThings.push(thing._id);
+                    }
+                });
+
+                if(newThings.length > 0){
+                    this.setState({
+                        thingsMarkers: this.state.thingsMarkers.concat(newThings)
+                    });
+                }
+
+            } else {
+                //console.log(err) 
+            }
+        }).catch(err => { 
+            console.log(err) 
+        });
+    }
+    // set back the loadNewThings to true
+    loadNewThings = true;
   }
 
   // function to open the single Ting screen passing the object content
-  goTotThing = () => {
-    this.props.navigation.navigate('Thing', {name: 'Jane'});
+  goTotThing = (i) => {
+    this.props.navigation.navigate('Thing',{
+        thing: this.state.thingsMarkers[i]
+    });
   };
 
   // function to open the filters Popover modal (toggle behaviour)
@@ -394,6 +275,27 @@ export default class HomeScreen extends React.Component {
   closeFilters = () => {
     this.setState({filtersVisible: false});
   };
+
+  // function to calculate the distance (meters) from 2 coordinates
+  calculateDistance(lat1, lon1, lat2, lon2) {
+    if ((lat1 == lat2) && (lon1 == lon2)) {
+      return 0;
+    }
+    else {
+      var radlat1 = Math.PI * lat1/180;
+      var radlat2 = Math.PI * lat2/180;
+      var theta = lon1-lon2;
+      var radtheta = Math.PI * theta/180;
+      var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+      if (dist > 1) {
+        dist = 1;
+      }
+      dist = Math.acos(dist);
+      dist = dist * 90/Math.PI;
+      dist = dist * 60 * 1.1515 * 1609.344;
+      return Math.ceil(dist);
+    }
+  }
 
 }
 
