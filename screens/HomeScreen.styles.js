@@ -46,19 +46,15 @@ export default StyleSheet.create({
   },
   thingSlides: {
     position: 'absolute',
-    width: width,
+    width: width - 32,
     height: height * 0.2,
     top: 16,
-    left: 0,
-    right: 0,
+    left: 16,
+    overflow: 'hidden'
   },
   thingSlide: {
     width: width - 32,
     height: height * 0.2,
-    padding: 16,
-    marginLeft: 16,
-    marginRight: 16,
-    borderRadius: 4,
     ...Platform.select({
       ios: {
         shadowColor: 'black',
@@ -71,8 +67,7 @@ export default StyleSheet.create({
       },
     }),
     backgroundColor: '#fbfbfb',
-  },
-  thingSlideContainer: {
+    borderRadius: 4,
     flexDirection: 'row'
   },
   thingSlideImage: {

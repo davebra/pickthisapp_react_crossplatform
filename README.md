@@ -19,6 +19,8 @@ PickThisApp React Native, Final Assignment project for the Cross Platform subjec
 * react-native-swiper-flatlist (to shows the swipe of views in Home screen)
 * react-native-swipe-list-view (to have a list with left/right swipe in My screen)
 * react-native-image-picker (to have the picker with open album or open camera in Add screen)
+* react-native-map-link (open the maps application)
+* react-native-actionsheet (actionsheet cross platform)
 
 #### Extra Infos
 

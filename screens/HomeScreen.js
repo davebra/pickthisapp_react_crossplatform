@@ -1,7 +1,7 @@
 import React from 'react';
-import { Image, TouchableOpacity, View, PermissionsAndroid, Platform, Text, Picker, AsyncStorage } from 'react-native';
+import { TouchableOpacity, PermissionsAndroid, Platform, Picker, AsyncStorage } from 'react-native';
+import { Button, Row, Image, Subtitle, Caption, View, Text } from '@shoutem/ui';
 import { Icon } from 'expo';
-import { Button } from '@shoutem/ui';
 import MapView, { Marker, ProviderPropType } from 'react-native-maps';
 import Popover from 'react-native-popover-view';
 import SwiperFlatList from 'react-native-swiper-flatlist';
@@ -106,33 +106,34 @@ export default class HomeScreen extends React.Component {
         <SwiperFlatList 
         style={this.state.showSwiper ? styles.thingSlides : {display: 'none'}} 
         ref='swiper'
-        onMomentumScrollEnd={this.onSlideSwiper} >
+        onMomentumScrollEnd={this.onSlideSwiper}>
           {this.state.thingsMarkers.map( (marker, i) => (
             <View key={i} style={styles.thingSlide}>
-                <TouchableOpacity onPress={() => { this.goTotThing(i) }}>
-                    <View style={styles.thingSlideContainer}>
-                    <Image
-                        style={styles.thingSlideImage}
-                        source={{uri: `${S3_BUCKET_URL}${marker.images[0]}`}}
-                    />
-                    <View style={[styles.thingSlideRight]}>
-                        <Text style={styles.thingSlideText}>Here there are: {marker._id}</Text>
-                        <View style={[styles.tagsContainer]}>
-                            {marker.tags.map( (tag, j) => (
-                            <TagText key={j}>{tag}</TagText>
-                            ))}
-                        </View>
-                        <Text>Availability: 
-                            {{
-                                ['full']: `Great!`,
-                                ['medium']: `Good`,
-                                ['low']: `Something's left`,
-                                ['empty']: `Gone`,
-                            }[marker.availability]}
-                        </Text>
-                    </View>
-                    </View>
-                </TouchableOpacity>
+            <Row styleName="rounded-corners">
+            <TouchableOpacity onPress={() => { this.goToThing(i) }}>
+              <Image
+                styleName="medium rounded-corners"
+                //style={styles.thingSlideImage}
+                source={{uri: `${S3_BUCKET_URL}${marker.images[0]}`}}
+              />
+            </TouchableOpacity>
+            <View styleName="vertical stretch space-between">
+                <Subtitle>Here there are:</Subtitle>
+                <View styleName="horizontal flex-start">
+                    {marker.tags.map( (tag, j) => (
+                    <TagText key={j}>{tag}</TagText>
+                    ))}
+                </View>
+                <Caption>Availability: 
+                    {{
+                        ['full']: ` Great!`,
+                        ['medium']: ` Good`,
+                        ['low']: ` Something's left`,
+                        ['empty']: ` Gone`,
+                    }[marker.availability]}
+                </Caption>
+            </View>
+            </Row>
             </View>
           ))}         
         </SwiperFlatList>
@@ -177,7 +178,7 @@ export default class HomeScreen extends React.Component {
             }, 600);
             loadNewThings = true;
         },
-        error => Alert.alert(error.message),
+        error => console.log(error.message),
         { enableHighAccuracy: false, timeout: 20000, maximumAge: 1000 }
     );
   };
@@ -186,11 +187,13 @@ export default class HomeScreen extends React.Component {
   onMarkerPress = (i) => {
     // do not move the map if marker is clicked
     moveTheMap = false; 
-    // if not visible, show the Swiper
-    if(!this.state.showSwiper) this.setState({showSwiper: true});
+
     // scroll the Swiper to the right thing
     this.refs.swiper._scrollToIndex(i);
     loadNewThings = false;
+
+    // if not visible, show the Swiper
+    if(!this.state.showSwiper) this.setState({showSwiper: true});
   }
 
   // manage SwipeSlide movement, center map to marker
@@ -257,7 +260,7 @@ export default class HomeScreen extends React.Component {
   }
 
   // function to open the single Ting screen passing the object content
-  goTotThing = (i) => {
+  goToThing = (i) => {
     this.props.navigation.navigate('Thing',{
         thing: this.state.thingsMarkers[i]
     });
