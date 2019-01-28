@@ -8,6 +8,7 @@ import TabBarLabel from '../components/TabBarLabel';
 import HomeScreen from '../screens/HomeScreen';
 import ThingScreen from '../screens/ThingScreen';
 import AddScreen from '../screens/AddScreen';
+import PublishedScreen from '../screens/PublishedScreen';
 import MyScreen from '../screens/MyScreen';
 import IntroScreen from '../screens/IntroScreen';
 import LoginScreen from '../screens/LoginScreen';
@@ -54,9 +55,14 @@ HomeStack.navigationOptions = ({navigation})=>{
   return navigationOptions;
 };
 
+const AddScreenStack = createStackNavigator({
+  Add: AddScreen,
+  Published: PublishedScreen,
+});
+
 const AddAuthStack = createSwitchNavigator(
   {
-    Add: AddScreen,
+    Add: AddScreenStack,
     Login: LoginScreen,
   },
   {

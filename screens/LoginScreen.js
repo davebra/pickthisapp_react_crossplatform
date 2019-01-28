@@ -12,6 +12,8 @@ import {
 import { loginUser, signupUser } from '../components/RestApi';
 import jwtDecode from 'jwt-decode';
 import { ScrollView } from 'react-native-gesture-handler';
+import Spinner from 'react-native-loading-spinner-overlay';
+import Colors from '../constants/Colors';
 
 export default class LoginScreen extends React.Component {
   state = {
@@ -19,6 +21,7 @@ export default class LoginScreen extends React.Component {
     chooseNickname: false,
     errorMessage: '',
     showErrorMessage: false,
+    spinner: false
   };
 
   // execute immediatly after Login Screen is mounted
@@ -42,6 +45,12 @@ export default class LoginScreen extends React.Component {
   render() {
     return (
       <ScrollView contentContainerStyle={styles.container}>
+        <Spinner
+          visible={this.state.spinner}
+          textContent={'Loading...'}
+          color={Colors.darkColor}
+          textStyle={{color: Colors.darkColor}}
+        />
         
         {!this.state.userLogged ? (
           <View style={styles.loginContainer}>
@@ -98,6 +107,7 @@ export default class LoginScreen extends React.Component {
 
   // function executed when the Google button is clicked
   googleAuth = async () => {
+    this.setState({spinner: true});
     try {
       const result = await Google.logInAsync({
         androidClientId: ANDROID_AUTH_CLIENT_ID,
@@ -110,18 +120,21 @@ export default class LoginScreen extends React.Component {
         this.checkLoginUser('google', result.user);
       } else {
         console.log(`Google Login Canceled`);
+        this.setState({spinner: false});
       }
     } catch(e) {
       console.log(`Google Login Error: ${e}`);
       this.setState({
         errorMessage: 'Error during login, please try again or choose a different login method.',
         showErrorMessage: true,
+        spinner: false
       });
     }
   }
 
   // function executed when the Facebook button is clicked
   facebookAuth = async () => {
+    this.setState({spinner: true});
     try {
       const { type, token } = await Facebook.logInWithReadPermissionsAsync(FACEBOOK_APP_ID, {
         permissions: ['public_profile', 'email'],
@@ -134,12 +147,14 @@ export default class LoginScreen extends React.Component {
         this.checkLoginUser('facebook', userInfo);
       } else {
         console.log(`Facebook Login Canceled`);
+        this.setState({spinner: false});
       }
     } catch ({ message }) {
       console.log(`Facebook Login Error: ${message}`);
       this.setState({
         errorMessage: 'Error during login, please try again or choose a different login method.',
         showErrorMessage: true,
+        spinner: false
       });
     }
   }
@@ -153,10 +168,12 @@ export default class LoginScreen extends React.Component {
         this.setState({
           userLogged: true,
           chooseNickname: true,
-          nickname: this.preloadNickname
+          nickname: this.preloadNickname,
+          spinner: false
         })
       }
       if( res.message === "Authentication successful!" ){
+        this.setState({spinner: false});
         // save 'yes' in the storage key 'alreadyLaunched'
         AsyncStorage.setItem('userToken', res.accesstoken);
         // back to the previous Screen
@@ -167,20 +184,24 @@ export default class LoginScreen extends React.Component {
       this.setState({
         errorMessage: 'Error during login, please try again or choose a different login method.',
         showErrorMessage: true,
+        spinner: false
       });
     });
   }
 
   checkSignupUser = () => {
+    this.setState({spinner: true});
     if( /^[a-zA-Z0-9-_]+$/.test(this.state.nickname) && this.state.nickname.length > 2 ){
       signupUser(this.provider, this.providerid, this.state.nickname).then(res => { 
         if( res.message === "User already exists" ){
           this.setState({
             errorMessage: 'This nickname is already taken, plase choose a different one.',
             showErrorMessage: true,
+            spinner: false
           });
         }
         if( res.message === "Authentication successful!" ){
+          this.setState({spinner: false});
           // save 'yes' in the storage key 'alreadyLaunched'
           AsyncStorage.setItem('userToken', res.accesstoken);
           // back to the previous Screen
@@ -191,12 +212,14 @@ export default class LoginScreen extends React.Component {
         this.setState({
           errorMessage: 'Error during login, please try again or choose a different login method.',
           showErrorMessage: true,
+          spinner: false
         });
       });
     } else {
       this.setState({
         errorMessage: 'Only letters, digits, dashes and underscores are allowed, minimum 3 characters.',
         showErrorMessage: true,
+        spinner: false
       });
     }
   }
