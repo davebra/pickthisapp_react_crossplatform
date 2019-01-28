@@ -1,6 +1,9 @@
 import React from 'react';
 import { StyleSheet, ScrollView, AsyncStorage } from 'react-native';
 import ImagePicker from 'react-native-image-picker';
+import jwtDecode from 'jwt-decode';
+import Colors from '../constants/Colors';
+
 
 export default class AddScreen extends React.Component {
   state = {
@@ -19,7 +22,7 @@ export default class AddScreen extends React.Component {
       if (value == null) {
         this.props.navigation.navigate('Login');
       } else {
-        this.setState({ userData: this.parseJwt(token) });
+        this.setState({ userData: jwtDecode(value) });
       }
     });
 
@@ -31,12 +34,6 @@ export default class AddScreen extends React.Component {
       </ScrollView>
     );
   }
-
-  parseJwt = (token) => {
-		var base64Url = token.split('.')[1];
-		var base64 = base64Url.replace('-', '+').replace('_', '/');
-		return JSON.parse(window.atob(base64));
-  };
 
   buttonTakePicture = () => {
     // const options = {
@@ -65,5 +62,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  iconFilter: {
+    marginTop: 1,
+    marginRight: 5,
+    color: Colors.primaryColor
   },
 });

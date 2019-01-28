@@ -1,4 +1,5 @@
 import { StyleSheet, Dimensions, Platform } from 'react-native';
+import Colors from '../constants/Colors';
 
 export const { width, height } = Dimensions.get('window');
 
@@ -11,6 +12,7 @@ export default StyleSheet.create({
   iconFilter: {
     marginTop: 1,
     marginRight: 5,
+    color: Colors.primaryColor
   },
   container: {
     flex: 1,
@@ -24,8 +26,7 @@ export default StyleSheet.create({
     top: 0,
     right: 0,
     width: 46,
-    height: 0,
-    backgroundColor: 'red'
+    height: 0
   },
   popoverContainer: {
     width: width * 0.75,
@@ -36,13 +37,11 @@ export default StyleSheet.create({
     alignItems: 'stretch',
   },
   popoverTitle: {
-    flex: 1,
     textAlign: 'center',
-    textAlignVertical: 'center'
+    marginTop: 24,
   },
   popoverPicker: {
     width: width * 0.75,
-    flex: 6,
   },
   thingSlides: {
     position: 'absolute',

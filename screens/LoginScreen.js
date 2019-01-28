@@ -2,14 +2,23 @@ import React from 'react';
 import { StyleSheet, AsyncStorage } from 'react-native';
 import { Icon, Google, Facebook } from 'expo';
 import { View, Button, Title, Text, TextInput, Caption } from '@shoutem/ui';
-import { ANDROID_AUTH_CLIENT_ID, IOS_AUTH_CLIENT_ID, ANDROID_STANDALONE_AUTH_CLIENT_ID, IOS_STANDALONE_AUTH_CLIENT_ID } from 'react-native-dotenv';
+import { 
+  ANDROID_AUTH_CLIENT_ID, 
+  IOS_AUTH_CLIENT_ID, 
+  ANDROID_STANDALONE_AUTH_CLIENT_ID, 
+  IOS_STANDALONE_AUTH_CLIENT_ID, 
+  FACEBOOK_APP_ID, 
+} from 'react-native-dotenv';
+import { loginUser, signupUser } from '../components/RestApi';
+import jwtDecode from 'jwt-decode';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default class LoginScreen extends React.Component {
   state = {
-    userInfo: null,
     userLogged: false,
     chooseNickname: false,
-    userData: {},
+    errorMessage: '',
+    showErrorMessage: false,
   };
 
   // execute immediatly after Login Screen is mounted
@@ -20,7 +29,11 @@ export default class LoginScreen extends React.Component {
       if (value == null) {
         this.setState({ userLogged: false });
       } else {
-        this.setState({ userToken: parseJwt(token) });
+        this.setState({ 
+          userLogged: true, 
+          chooseNickname: false,
+          showErrorMessage: false,
+          userData: jwtDecode(value) });
       }
     });
 
@@ -28,7 +41,7 @@ export default class LoginScreen extends React.Component {
 
   render() {
     return (
-      <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>
         
         {!this.state.userLogged ? (
           <View style={styles.loginContainer}>
@@ -48,30 +61,38 @@ export default class LoginScreen extends React.Component {
               <Title style={styles.loginTitle}>Choose a nickname</Title>
               <TextInput
                 placeholder={'Nickname'}
-                //onChangeText={...}
+                onChangeText={(nickname) => this.setState({nickname})}
+                value={this.state.nickname}
               />
               <Button 
                 styleName="secondary" 
                 style={styles.confirmNickname} 
-                onPress={this.confirmNickname} 
+                onPress={this.checkSignupUser} 
                 muted>
               <Icon.Entypo name="check" style={styles.iconButton} />
-              <Text>CONFIRM</Text>
+              <Text>COMPLETE SIGNUP</Text>
             </Button>
             </View>
           ) : (
             <View style={styles.loginContainer}>
-              <Title style={styles.loginTitle}>Hey {this.userToken.nickname}!</Title>
-              <Button styleName="secondary" style={styles.logoutTouchable} onPress={this.executeLogout}>
-                <Icon.SimpleLineIcons name="logout" style={styles.iconButton} />
+              <Title style={styles.loginTitle}>Hey {this.state.userData.nickname}!</Title>
+              <Button style={styles.logoutTouchable} onPress={this.executeLogout}>
+                <Icon.SimpleLineIcons name="logout" style={styles.logoutIconButton} />
                 <Text>I WANT TO LOGOUT</Text>
+              </Button>
+              <Button styleName="secondary" onPress={()=>{this.props.navigation.goBack()}}>
+                <Icon.AntDesign name="back" style={styles.iconButton} />
+                <Text>BACK TO YOUR THINGS</Text>
               </Button>
             </View>
           )
         )}
 
+        <Text style={
+          this.state.showErrorMessage ? (styles.errorMessage) : ({display: 'none'}) }>{this.state.errorMessage}</Text>
+
         <Caption style={styles.loginBottomText}>We will never spam, you, that's a promise!</Caption>
-      </View>
+      </ScrollView>
     );
   }
 
@@ -86,52 +107,105 @@ export default class LoginScreen extends React.Component {
         scopes: ['profile', 'email'],
       });
       if (result.type === 'success') {
-        console.log(result);
+        this.checkLoginUser('google', result.user);
       } else {
         console.log(`Google Login Canceled`);
       }
     } catch(e) {
       console.log(`Google Login Error: ${e}`);
+      this.setState({
+        errorMessage: 'Error during login, please try again or choose a different login method.',
+        showErrorMessage: true,
+      });
     }
   }
 
   // function executed when the Facebook button is clicked
   facebookAuth = async () => {
     try {
-      const {
-        type,
-        token,
-        expires,
-        permissions,
-        declinedPermissions,
-      } = await Facebook.logInWithReadPermissionsAsync('<APP_ID>', {
+      const { type, token } = await Facebook.logInWithReadPermissionsAsync(FACEBOOK_APP_ID, {
         permissions: ['public_profile', 'email'],
+        behavior: 'web'
       });
       if (type === 'success') {
         // Get the user's name using Facebook's Graph API
         const userInfoResponse = await fetch(`https://graph.facebook.com/me?access_token=${token}`);
         const userInfo = await userInfoResponse.json();
-        this.setState({ userInfo });
-        console.log(userInfo);
+        this.checkLoginUser('facebook', userInfo);
       } else {
         console.log(`Facebook Login Canceled`);
       }
     } catch ({ message }) {
       console.log(`Facebook Login Error: ${message}`);
+      this.setState({
+        errorMessage: 'Error during login, please try again or choose a different login method.',
+        showErrorMessage: true,
+      });
     }
   }
 
-  parseJwt(token) {
-		var base64Url = token.split('.')[1];
-		var base64 = base64Url.replace('-', '+').replace('_', '/');
-		return JSON.parse(window.atob(base64));
-  };
+  checkLoginUser = (prov, userObj) => {
+    this.provider = prov;
+    this.providerid = userObj.id;
+    this.preloadNickname = userObj.name.replace(/[^a-z0-9]/gi,''); // nickname only alphanumeric
+    loginUser(this.provider, this.providerid).then(res => { 
+      if( res.message === "User not exists" ){
+        this.setState({
+          userLogged: true,
+          chooseNickname: true,
+          nickname: this.preloadNickname
+        })
+      }
+      if( res.message === "Authentication successful!" ){
+        // save 'yes' in the storage key 'alreadyLaunched'
+        AsyncStorage.setItem('userToken', res.accesstoken);
+        // back to the previous Screen
+        this.props.navigation.goBack();
+      }
+    }).catch(err => { 
+      console.log(err);
+      this.setState({
+        errorMessage: 'Error during login, please try again or choose a different login method.',
+        showErrorMessage: true,
+      });
+    });
+  }
 
+  checkSignupUser = () => {
+    if( /^[a-zA-Z0-9-_]+$/.test(this.state.nickname) && this.state.nickname.length > 2 ){
+      signupUser(this.provider, this.providerid, this.state.nickname).then(res => { 
+        if( res.message === "User already exists" ){
+          this.setState({
+            errorMessage: 'This nickname is already taken, plase choose a different one.',
+            showErrorMessage: true,
+          });
+        }
+        if( res.message === "Authentication successful!" ){
+          // save 'yes' in the storage key 'alreadyLaunched'
+          AsyncStorage.setItem('userToken', res.accesstoken);
+          // back to the previous Screen
+          this.props.navigation.goBack();
+        }
+      }).catch(err => { 
+        console.log(err);
+        this.setState({
+          errorMessage: 'Error during login, please try again or choose a different login method.',
+          showErrorMessage: true,
+        });
+      });
+    } else {
+      this.setState({
+        errorMessage: 'Only letters, digits, dashes and underscores are allowed, minimum 3 characters.',
+        showErrorMessage: true,
+      });
+    }
+  }
+  
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: '#fff',
     flexDirection: 'column',
     justifyContent: 'center',
@@ -163,6 +237,16 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   logoutTouchable: {
-
+    marginBottom: 16
+  },
+  logoutIconButton: {
+    fontSize: 22,
+    marginRight: 14,
+    color: '#000'
+  },
+  errorMessage: {
+    textAlign: 'center',
+    color: '#D84F52',
+    marginTop: 20
   }
 });

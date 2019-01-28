@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, ScrollView, Dimensions, Image, Platform } from 'react-native';
+import { StyleSheet, ScrollView, Dimensions, Image, AsyncStorage, Alert } from 'react-native';
 import { Icon } from 'expo';
 import { Button, Lightbox, Title, Text, View } from '@shoutem/ui';
 import SwiperFlatList from 'react-native-swiper-flatlist';
@@ -8,22 +8,30 @@ import { TagText } from '../components/TagText';
 import { showLocation } from 'react-native-map-link';
 import ActionSheet from 'react-native-actionsheet'
 
-export default class ThingScreen extends React.Component {
+import { changeThingAvailability, changeThingStatus } from '../components/RestApi';
+import Colors from '../constants/Colors';
 
+export default class ThingScreen extends React.Component {
   static navigationOptions = {
     title: 'Thing',
   };
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      thing: props.navigation.state.params.thing
+    }
+  }
+
   render() {
     const { width, height } = Dimensions.get('window');
-    const { thing } = this.props.navigation.state.params;
     return (
       <ScrollView style={styles.container}>
       <SwiperFlatList 
       style={{ width, height: height * 0.5, backgroundColor: '#000' }} 
       showPagination
       paginationStyle={styles.swiperPagination}>
-      {thing.images.map( (image, i) => (
+      {this.state.thing.images.map( (image, i) => (
         <View key={i} style={{ width, height: height * 0.5 }}>
           <Lightbox renderContent={() => { return this.renderLightboxImage(image); }}>
             <Image
@@ -36,13 +44,19 @@ export default class ThingScreen extends React.Component {
       </SwiperFlatList>
       <Title style={styles.thingTitle}>What's in here:</Title>
       <View styleName="horizontal h-start" style={styles.tagsContainer}>
-          {thing.tags.map( (tag, j) => (
-          <TagText key={j}>{tag}</TagText>
+          {this.state.thing.tags.map( (tag, j) => (
+          <TagText key={j} style={{fontSize: 18}}>{tag}</TagText>
           ))}
       </View>
+      <Title style={styles.thingAvailability}>Availability: {{
+            ['full']: ` Everything's there!`,
+            ['medium']: ` Most things still there`,
+            ['low']: ` Something's left`,
+            ['empty']: ` Everything's gone`,
+        }[this.state.thing.availability]}</Title>
       <Button 
         styleName="secondary" 
-        onPress={() => { this.driveMeHere(thing.location.coordinates[1], thing.location.coordinates[0]) }} 
+        onPress={() => { this.driveMeHere(this.state.thing.location.coordinates[1], this.state.thing.location.coordinates[0]) }} 
         style={styles.oneButton}
         >
         <Icon.MaterialCommunityIcons name="car-pickup" style={styles.iconButton} />
@@ -61,7 +75,7 @@ export default class ThingScreen extends React.Component {
           title={'What is the availability of this thing?'}
           options={['Everything\'s there', 'Most still there', 'Something\'s left', 'Everything\'s gone', 'cancel']}
           cancelButtonIndex={4}
-          onPress={(index) => { /* do something */ }}
+          onPress={(index) => { this.updateAvailability(index) }}
         />
       <Button 
         styleName="secondary" 
@@ -76,7 +90,7 @@ export default class ThingScreen extends React.Component {
           title={'What do you want to report?'}
           options={['Spam', 'Inappropriate', 'Duplicate', 'cancel']}
           cancelButtonIndex={3}
-          onPress={(index) => { /* do something */ }}
+          onPress={(index) => { this.updateStatus(index) }}
         />
       </ScrollView>
     );
@@ -87,7 +101,7 @@ export default class ThingScreen extends React.Component {
       <Image
         style={styles.lightboxImage}
         resizeMode="contain"
-        source={{ uri: `${S3_BUCKET_URL}${image}` }}
+        source={{ uri: `${S3_BUCKET_URL}${image}`, cache: 'only-if-cached' }}
       />
     </View>
   )
@@ -102,11 +116,92 @@ export default class ThingScreen extends React.Component {
   }
 
   showAvailabilityActionSheet = () => {
-    this.AvailabilityActionSheet.show()
+    // check if is the user is already logged in, if not, open Login
+    AsyncStorage.getItem('userToken').then( value => {
+      if (value == null) {
+        this.props.navigation.navigate('Login');
+      } else {
+        this.AvailabilityActionSheet.show()
+      }
+    });
+  }
+
+  updateAvailability = (i) => {
+    var av;
+    switch (i){
+      case 0:
+        av = 'full';
+      break;
+      case 1:
+        av = 'medium';
+      break;
+      case 2:
+        av = 'low';
+      break;
+      case 3:
+        av = 'empty';
+      break;
+      default:
+      return;
+    }
+    changeThingAvailability(this.state.thing._id, av).then(res => { 
+      this.showAlert('Availability Updated!', 'Thanks for update the availability of this thing!');
+      this.setState(prevState => ({
+        thing: {
+            ...prevState.thing,
+            availability: av
+        }
+      }));
+
+    }).catch(err => { 
+      this.showAlert('Oooops...!', 'Something went wrong during the update, please try again later.');
+      console.log(err) 
+    });
   }
 
   showInappropriateActionSheet = () => {
-    this.InappropriateActionSheet.show()
+    // check if is the user is already logged in, if not, open Login
+    AsyncStorage.getItem('userToken').then( value => {
+      if (value == null) {
+        this.props.navigation.navigate('Login');
+      } else {
+        this.InappropriateActionSheet.show()
+      }
+    });
+  }
+
+  updateStatus = (i) => {
+    var status;
+    switch (i){
+      case 0:
+      status = 'spam';
+      break;
+      case 1:
+      status = 'inappropriate';
+      break;
+      case 2:
+      status = 'dulicate';
+      break;
+      default:
+      return;
+    }
+    changeThingStatus(this.state.thing._id, status).then(res => { 
+      this.showAlert('Status Updated!', 'Thanks, your report has been submitted and the staff of Pick This App will review it.');
+    }).catch(err => { 
+      this.showAlert('Oooops...!', 'Something went wrong during the update, please try again later.');
+      console.log(err) 
+    });
+  }
+
+  showAlert = (title, text) => {
+    Alert.alert(
+      title,
+      text,
+      [
+        {text: 'OK', onPress: () => console.log('OK Pressed')},
+      ],
+      {cancelable: false},
+    );
   }
 
 }
@@ -121,14 +216,18 @@ const styles = StyleSheet.create({
   oneButton: {
     marginBottom: 18,
     marginLeft: 16,
-    marginRight: 16
+    marginRight: 16,
+    height: 52,
+    backgroundColor: Colors.primaryColor,
+    borderColor: Colors.noticeText,
   },
   buttonReport: {
     marginBottom: 26,
     marginLeft: 16,
     marginRight: 16,
-    backgroundColor: 'red',
-    borderColor: 'red',
+    height: 52,
+    backgroundColor: Colors.dangerColor,
+    borderColor: Colors.noticeText,
     color: '#fff'
   },
   iconButton: {
@@ -137,13 +236,18 @@ const styles = StyleSheet.create({
     color: '#fff'
   },
   tagsContainer:{
-    marginTop: 10,
+    marginTop: 12,
     paddingLeft: 16,
     paddingRight: 16,
-    marginBottom: 20,
+    marginBottom: 24,
   },
   thingTitle:{
-    marginTop: 16,
+    marginTop: 22,
+    paddingLeft: 16,
+    paddingRight: 16
+  },
+  thingAvailability: {
+    marginBottom: 24,
     paddingLeft: 16,
     paddingRight: 16
   },
@@ -161,14 +265,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000'
   },
   swiperPagination: {
-    ...Platform.select({
-      ios: {
-        bottom: height * 0.5 - 50
-      },
-      android: {
-        bottom: height * 0.5 + 10
-      },
-    }),
+    bottom: height * 0.5 + 10
   }
 
 });

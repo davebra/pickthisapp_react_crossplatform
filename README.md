@@ -21,6 +21,8 @@ PickThisApp React Native, Final Assignment project for the Cross Platform subjec
 * react-native-image-picker (to have the picker with open album or open camera in Add screen)
 * react-native-map-link (open the maps application)
 * react-native-actionsheet (actionsheet cross platform)
+* react-native-loading-spinner-overlay (loading overlay)
+* react-timestamp (format date time)
 
 #### Extra Infos
 

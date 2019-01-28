@@ -1,8 +1,8 @@
 import React from 'react';
-import { TouchableOpacity, PermissionsAndroid, Platform, Picker, AsyncStorage } from 'react-native';
+import { TouchableOpacity, Picker, AsyncStorage } from 'react-native';
 import { Button, Row, Image, Subtitle, Caption, View, Text } from '@shoutem/ui';
 import { Icon } from 'expo';
-import MapView, { Marker, ProviderPropType } from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 import Popover from 'react-native-popover-view';
 import SwiperFlatList from 'react-native-swiper-flatlist';
 import { S3_BUCKET_URL } from 'react-native-dotenv';
@@ -17,7 +17,18 @@ export default class HomeScreen extends React.Component {
     filtersVisible: false,
     thingsAvailability: 'all',
     showSwiper: false,
-    thingsMarkers: []
+    thingsMarkers: [],
+    selectedMarker: ''
+  }
+
+  constructor(props){
+    super(props);
+    
+    // property that I need to update the states only when I want
+
+    this.moveTheMap = true;
+    this.loadNewThings = true;
+    this.downloadedThings = [];
   }
 
   // set the header navigator options, with the filter button
@@ -25,14 +36,11 @@ export default class HomeScreen extends React.Component {
     const { params = {} } = navigation.state;
     return {
       title: 'Home',
-      // headerTitle: (
-      //   <View style={styles.headerLogo}>
-      //     <Image
-      //         source={require('./some/image.png')}
-      //         style={{width:110, height:18}}
-      //     />
-      //   </View>
-      // ),
+      headerTitle: (
+        <View>
+          <Image source={require('../assets/images/logotop.png')} />
+        </View>
+      ),
       headerRight: <Button onPress={params.openFilters} title='filter'>
                     <Icon.MaterialCommunityIcons 
                     name={'filter'} 
@@ -45,23 +53,25 @@ export default class HomeScreen extends React.Component {
   // execute immediatly after Home Screen is mounted
   componentDidMount() {
 
-    // property that I need to update the states only when I want
-    moveTheMap = true;
-    loadNewThings = true;
-    downloadedThings = [];
+    //AsyncStorage.clear();
 
     // check if is the first time the app is launched
     AsyncStorage.getItem('alreadyLaunched').then( value => {
         if (value == null) {
+
           this.props.navigation.navigate('Intro');
+
+        } else {
+
+          // pass the parameters for the filters
+          this.props.navigation.setParams({ openFilters: this.showFilters });
+
+          // load user location
+          this.getUserLocation();
+
         }
     });
-    
-    // pass the parameters for the filters
-    this.props.navigation.setParams({ openFilters: this.showFilters });
-
-    // load user location
-    this.getUserLocation();
+  
   }
   
   render() {
@@ -97,8 +107,15 @@ export default class HomeScreen extends React.Component {
                   e.stopPropagation(); 
                   this.onMarkerPress(i)
                 }}
-              //image={require('../assets/pin.png')}
-            />
+              centerOffset={{ x: 0, y: -20 }}
+              anchor={{ x: 0.5, y: 1 }}
+              style={this.showBasedOnAvailability(marker.availability) ?{}: {display: 'none'}}
+            >
+            <Image
+              style={{width: 40, height: 40}}
+              source={(this.state.selectedMarker === marker._id) ? require('../assets/images/selected.png') : require('../assets/images/marker.png')}
+             />
+            </Marker>
           ))}
           
         </MapView>
@@ -108,13 +125,12 @@ export default class HomeScreen extends React.Component {
         ref='swiper'
         onMomentumScrollEnd={this.onSlideSwiper}>
           {this.state.thingsMarkers.map( (marker, i) => (
-            <View key={i} style={styles.thingSlide}>
+            <View key={i} style={this.showBasedOnAvailability(marker.availability) ? styles.thingSlide : {display: 'none'}}>
             <Row styleName="rounded-corners">
             <TouchableOpacity onPress={() => { this.goToThing(i) }}>
               <Image
                 styleName="medium rounded-corners"
-                //style={styles.thingSlideImage}
-                source={{uri: `${S3_BUCKET_URL}${marker.images[0]}`}}
+                source={{uri: `${S3_BUCKET_URL}${marker.images[0]}`, cache: 'only-if-cached'}}
               />
             </TouchableOpacity>
             <View styleName="vertical stretch space-between">
@@ -146,12 +162,12 @@ export default class HomeScreen extends React.Component {
           placement="bottom"
           onClose={() => this.closeFilters()}>
           <View style={styles.popoverContainer}>
-            <Text style={styles.popoverTitle}>I'm the content of this popover!</Text>
+            <Text style={styles.popoverTitle}>Filter things by availability</Text>
             <Picker
             selectedValue={this.state.thingsAvailability}
             style={styles.popoverPicker}
             onValueChange={(itemValue, itemIndex) => this.setState({thingsAvailability: itemValue})}>
-            <Picker.Item label="All" value="all" />
+            <Picker.Item label="Show All" value="all" />
             <Picker.Item label="Everything's there" value="full" />
             <Picker.Item label="Most still's there" value="medium" />
             <Picker.Item label="Something's left" value="low" />
@@ -176,7 +192,7 @@ export default class HomeScreen extends React.Component {
                 latitudeDelta: 0.1, 
                 longitudeDelta: 0.1
             }, 600);
-            loadNewThings = true;
+            this.loadNewThings = true;
         },
         error => console.log(error.message),
         { enableHighAccuracy: false, timeout: 20000, maximumAge: 1000 }
@@ -186,43 +202,45 @@ export default class HomeScreen extends React.Component {
   // manage marker click, select SwipeSlide and center map to marker
   onMarkerPress = (i) => {
     // do not move the map if marker is clicked
-    moveTheMap = false; 
+    this.moveTheMap = false; 
 
     // scroll the Swiper to the right thing
     this.refs.swiper._scrollToIndex(i);
-    loadNewThings = false;
+
+    this.setState({selectedMarker: this.state.thingsMarkers[i]._id});
 
     // if not visible, show the Swiper
     if(!this.state.showSwiper) this.setState({showSwiper: true});
+
   }
 
   // manage SwipeSlide movement, center map to marker
   onSlideSwiper = (i) => {
+
     // if marker is clicked, this will be false, so don't move the map
-    if(moveTheMap){
+    if(this.moveTheMap){
+        this.loadNewThings = false;
         this.refs.map.animateToRegion({
             latitude: this.state.thingsMarkers[i.index].location.coordinates[1], 
             longitude: this.state.thingsMarkers[i.index].location.coordinates[0], 
             latitudeDelta: 0.09, 
             longitudeDelta: 0.09
-        }, 500);
+        }, 400);
+        this.setState({selectedMarker: this.state.thingsMarkers[i.index]._id});
+    } else {
+      this.moveTheMap = true;
     }
-
-    loadNewThings = false;
-
-    // set back the move map to true
-    moveTheMap = true;
   }
 
   // manage map click not on a marker
   onMapPress = () => {
-    loadNewThings = false;
-    if(this.state.showSwiper) this.setState({showSwiper: false});    
+    this.loadNewThings = false;
+    if(this.state.showSwiper) this.setState({showSwiper: false, selectedMarker: -1});    
   }
 
   // manage map movement event, fetch and reload markers
   onRegionChangeComplete = (region) => {
-    if(loadNewThings){
+    if(this.loadNewThings){
       getThings(
         region.latitude, 
         region.longitude, 
@@ -236,9 +254,9 @@ export default class HomeScreen extends React.Component {
             if( Array.isArray(res) ){
                 let newThings = [];
                 res.forEach(thing => {
-                    if (!downloadedThings.includes(thing._id)) {
+                    if (!this.downloadedThings.includes(thing._id)) {
                         newThings.push(thing);
-                        downloadedThings.push(thing._id);
+                        this.downloadedThings.push(thing._id);
                     }
                 });
 
@@ -248,15 +266,13 @@ export default class HomeScreen extends React.Component {
                     });
                 }
 
-            } else {
-                //console.log(err) 
             }
         }).catch(err => { 
             console.log(err) 
         });
     }
     // set back the loadNewThings to true
-    loadNewThings = true;
+    this.loadNewThings = true;
   }
 
   // function to open the single Ting screen passing the object content
@@ -278,6 +294,14 @@ export default class HomeScreen extends React.Component {
   closeFilters = () => {
     this.setState({filtersVisible: false});
   };
+
+  showBasedOnAvailability(av){
+    if(this.state.thingsAvailability === 'all' || this.state.thingsAvailability === av){
+      return true
+    } else {
+      return false
+    }
+  }
 
   // function to calculate the distance (meters) from 2 coordinates
   calculateDistance(lat1, lon1, lat2, lon2) {

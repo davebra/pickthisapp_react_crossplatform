@@ -15,17 +15,20 @@
     "@shoutem/theme": "^0.11.1",
     "@shoutem/ui": "^0.23.9",
     "expo": "^32.0.0",
+    "jwt-decode": "^2.2.0",
     "react": "16.5.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-32.0.0.tar.gz",
     "react-native-actionsheet": "^2.4.2",
     "react-native-image-picker": "^0.28.0",
+    "react-native-loading-spinner-overlay": "^1.0.1",
     "react-native-map-link": "^2.1.5",
     "react-native-maps": "^0.23.0",
     "react-native-popover-view": "^1.0.17",
     "react-native-swipe-list-view": "^1.5.1",
     "react-native-swiper-flatlist": "^1.0.9",
     "react-navigation": "^3.0.9",
-    "react-navigation-popover": "^1.1.1"
+    "react-navigation-popover": "^1.1.1",
+    "react-timestamp": "^4.4.0"
   },
   "devDependencies": {
     "babel-preset-expo": "^5.0.0",

@@ -73,12 +73,7 @@ export async function getUserThings(userid) {
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                provider,
-                providerid,
-                nickname
-            }),
+            }
         })
         .then((resp) => {
             return resp.json();

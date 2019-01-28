@@ -1,16 +1,44 @@
 import React from 'react';
-import { StyleSheet, TouchableHighlight, AsyncStorage } from 'react-native';
+import { StyleSheet, TouchableHighlight, AsyncStorage, Alert } from 'react-native';
+import { Icon } from 'expo';
+import { Button, Row, Image, Subtitle, Caption, View, Text } from '@shoutem/ui';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import jwtDecode from 'jwt-decode';
+import Colors from '../constants/Colors';
+import { getUserThings, changeThingStatus } from '../components/RestApi';
+import Spinner from 'react-native-loading-spinner-overlay';
+import { S3_BUCKET_URL } from 'react-native-dotenv';
+import Timestamp from 'react-timestamp';
 
 export default class MyScreen extends React.Component {
-  state = {
-    userData: {},
-    userThings: [],
-  };
 
-  static navigationOptions = {
+  constructor(props) {
+    super(props);
+    this.state = {
+      userData: {},
+      userThings: [],
+      listViewData: Array(20).fill('').map((_,i) => ({key: `${i}`, text: `item #${i}`})),
+      spinner: false
+    };
+  }
+
+  static navigationOptions = ({ navigation }) => {
+    return {
     title: 'My Things',
-  };
+    headerRight: <Button title='user'
+                  onPress={() => { navigation.navigate('Login') }}
+                  >
+                    <Icon.FontAwesome 
+                    name={'user'} 
+                    size={28} 
+                    style={{
+                      marginTop: 2,
+                      marginRight: 12,
+                      color: Colors.primaryColor
+                    }} />
+                  </Button>
+    };
+  }
 
   // execute immediatly after My Screen is mounted
   componentDidMount() {
@@ -20,7 +48,8 @@ export default class MyScreen extends React.Component {
       if (value == null) {
         this.props.navigation.navigate('Login');
       } else {
-        this.setState({ userData: this.parseJwt(token) });
+        this.setState({ userData: jwtDecode(value), spinner: true });
+        this.loadMyThings();
       }
     });
 
@@ -28,39 +57,127 @@ export default class MyScreen extends React.Component {
 
   render() {
     return (
+      <View style={{...StyleSheet.absoluteFill}}>
+      <Spinner
+        visible={this.state.spinner}
+        textContent={'Loading...'}
+        color={Colors.darkColor}
+        textStyle={{color: Colors.darkColor}}
+      />
       <SwipeListView
         useFlatList
         style={styles.container}
         data={this.state.userThings}
+        keyExtractor={(rowData, index) => {
+          return index.toString();
+        }}
         renderItem={ (thing, rowMap) => (
-          <TouchableHighlight onPress={this.goTotThing(thing)}>
+          <TouchableHighlight onPress={() =>{ this.goToThing(thing.item) }}>
             <View>
-              <Text>{thing._id}</Text>
+            <Row style={{margin: 0}}>
+              <Image
+                styleName="small rounded-corners"
+                source={{uri: `${S3_BUCKET_URL}${thing.item.images[0]}`, cache: 'only-if-cached'}}
+              />
+            <View styleName="vertical stretch space-between">
+                <Subtitle>Thing of <Timestamp time={thing.item.timestamp} format='full' component={Text} /></Subtitle>
+                <Caption>Status: 
+                    {{
+                        ['live']: ` Active`,
+                        ['paused']: ` Paused`,
+                    }[thing.item.status]}
+                </Caption>
+            </View>
+            </Row>
             </View>
           </TouchableHighlight>
         )}
         renderHiddenItem={ (thing, rowMap) => (
             <View style={styles.rowBack}>
-                <Text>Left</Text>
-                <Text>Right</Text>
+              <Button 
+              styleName="stacked clear" 
+              onPress={ () => {
+                rowMap[thing.index].manuallySwipeRow(0);
+                this.clickPauseThing( thing.item._id, (thing.item.status === 'live' ) ? 'paused' : 'live' )
+              }}
+              style={styles.buttonPlayPause}>
+                  {{
+                      ['live']: <Icon.MaterialCommunityIcons name="pause" size={20} />,
+                      ['paused']: <Icon.MaterialCommunityIcons name="play" size={20} />,
+                  }[thing.item.status]}
+                  {{
+                      ['live']: <Text>Pause</Text>,
+                      ['paused']: <Text>Resume</Text>,
+                  }[thing.item.status]}
+              </Button>
+              <Button 
+                styleName="stacked clear"  
+                style={styles.buttonDelete}
+                onPress={ () => {
+                  rowMap[thing.index].manuallySwipeRow(0);
+                  this.clickDeleteThing( thing.item._id )
+                }}>
+                <Icon.FontAwesome name="trash-o" style={{color: Colors.lightColor}} size={20} />
+                <Text style={{color: Colors.lightColor}}>Delete</Text>
+              </Button>
             </View>
         )}
-        leftOpenValue={75}
-        rightOpenValue={-75}
+        disableRightSwipe={true}
+        rightOpenValue={-160}
       />
+      </View>
     );
   }
 
-  parseJwt = (token) => {
-		var base64Url = token.split('.')[1];
-		var base64 = base64Url.replace('-', '+').replace('_', '/');
-		return JSON.parse(window.atob(base64));
+  // function to open the single Thing screen passing the object content
+  goToThing = (thing) => {
+    this.props.navigation.navigate('Thing',{
+        thing: thing
+    });
   };
 
-  // function to open the single Thing screen passing the object content
-  goTotThing = (thing) => {
-    this.props.navigation.navigate('Thing', thing);
-  };
+  loadMyThings = () => {
+    getUserThings(this.state.userData.id).then(res => { 
+        if( Array.isArray(res) ){
+          this.setState({
+            userThings: res,
+            spinner: false
+          });
+        }
+      }).catch(err => { 
+        console.log(err) 
+    });
+  }
+
+    // delete is clicked, update the status on the RestAPI
+    clickDeleteThing = (thingid) => {
+      changeThingStatus(thingid, 'deleted').then(res => {
+        this.showAlert('Thing Deleted', 'Your thing has been succesfully deleted.');
+        this.setState({spinner: true});
+        this.loadMyThings();
+      });
+    }
+  
+    // pause/resume is clicked, update the status on the RestAPI
+    clickPauseThing = (thingid, status) => {
+      var statusText = (status === 'live') ? 'resumed' : 'paused';
+      changeThingStatus(thingid, status).then(res => {
+        this.showAlert( `Thing ${statusText}`, `Your thing has been succesfully ${statusText}.`);
+        this.setState({spinner: true});
+        this.loadMyThings();
+      });
+    }
+
+    showAlert = (title, text) => {
+      Alert.alert(
+        title,
+        text,
+        [
+          {text: 'OK', onPress: () => console.log('OK Pressed')},
+        ],
+        {cancelable: false},
+      );
+    }
 
 }
 
@@ -70,6 +187,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   rowBack: {
-    backgroundColor: '#ff0'
+    flexDirection: 'row',
+    justifyContent: 'flex-end'
+  },
+  iconFilter: {
+    marginTop: 1,
+    marginRight: 5,
+    color: Colors.primaryColor
+  },
+  buttonPlayPause:{
+    backgroundColor: Colors.tabIconDefault,
+    width: 80,
+  },
+  buttonDelete:{
+    backgroundColor: Colors.dangerColor,
+    width: 80,
   }
 });

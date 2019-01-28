@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text } from 'react-native';
+import Colors from '../constants/Colors';
 
 export class TagText extends React.Component {
   render() {
@@ -9,7 +10,7 @@ export class TagText extends React.Component {
       paddingTop: 2,
       paddingBottom: 2,
       marginRight: 4,
-      backgroundColor: '#506A8E',
+      backgroundColor: Colors.secondaryColor,
       color: 'white',
       borderRadius: 3,
       overflow: 'hidden'

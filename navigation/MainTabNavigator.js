@@ -3,6 +3,8 @@ import { Platform } from 'react-native';
 import { createStackNavigator, createSwitchNavigator, createBottomTabNavigator } from 'react-navigation';
 
 import TabBarIcon from '../components/TabBarIcon';
+import TabBarLabel from '../components/TabBarLabel';
+
 import HomeScreen from '../screens/HomeScreen';
 import ThingScreen from '../screens/ThingScreen';
 import AddScreen from '../screens/AddScreen';
@@ -13,19 +15,28 @@ import LoginScreen from '../screens/LoginScreen';
 const HomeThingStack = createStackNavigator({
   Home: HomeScreen,
   Thing: ThingScreen,
+  Login: LoginScreen,
 });
 
 const HomeStack = createSwitchNavigator(
   {
     HomeStack: HomeThingStack,
     Intro: IntroScreen,
+  },
+  {
+    backBehavior: 'initialRoute'
   }
 );
 
 HomeStack.navigationOptions = ({navigation})=>{
   let { routeName } = navigation.state.routes[navigation.state.index];
   let navigationOptions = {
-    tabBarLabel: 'Things Around',
+    tabBarLabel: ({ focused }) => (
+      <TabBarLabel
+        focused={focused}
+        title={'Things Around'}
+      />
+    ),
     tabBarIcon: ({ focused }) => (
       <TabBarIcon
         focused={focused}
@@ -47,11 +58,19 @@ const AddAuthStack = createSwitchNavigator(
   {
     Add: AddScreen,
     Login: LoginScreen,
+  },
+  {
+    backBehavior: 'initialRoute'
   }
 );
 
 AddAuthStack.navigationOptions = {
-  tabBarLabel: 'Add Thing',
+  tabBarLabel: ({ focused }) => (
+    <TabBarLabel
+      focused={focused}
+      title={'Add Things'}
+    />
+  ),
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
@@ -69,12 +88,19 @@ const MyAuthStack = createSwitchNavigator(
   {
     MyStack: MyThingStack,
     Login: LoginScreen,
+  },
+  {
+    backBehavior: 'initialRoute'
   }
 );
 
 MyAuthStack.navigationOptions = {
-  tabBarLabel: 'My Things',
-  tabBarIcon: ({ focused }) => (
+  tabBarLabel: ({ focused }) => (
+    <TabBarLabel
+      focused={focused}
+      title={'My Things'}
+    />
+  ),  tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
       name={Platform.OS === 'ios' ? 'ios-star' : 'md-star'}
@@ -86,4 +112,11 @@ export default createBottomTabNavigator({
   HomeStack,
   AddAuthStack,
   MyAuthStack,
-});
+},{
+  tabBarOptions: {
+    style: {
+      height: 56,
+    },
+  }
+}
+);
