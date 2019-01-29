@@ -49,25 +49,14 @@ export default StyleSheet.create({
     height: height * 0.2,
     top: 16,
     left: 16,
-    overflow: 'hidden'
+    borderRadius: 4,
+    overflow: 'hidden',
   },
   thingSlide: {
     width: width - 32,
     height: height * 0.2,
-    ...Platform.select({
-      ios: {
-        shadowColor: 'black',
-        shadowOffset: { height: -3 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-      },
-      android: {
-        elevation: 20,
-      },
-    }),
     backgroundColor: '#fbfbfb',
-    borderRadius: 4,
-    flexDirection: 'row'
+    flexDirection: 'row',
   },
   thingSlideImage: {
     width: height * 0.2 - 32,

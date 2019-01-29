@@ -105,9 +105,16 @@ export default class LoginScreen extends React.Component {
     );
   }
 
+  executeLogout = () => {
+    AsyncStorage.removeItem('userToken');
+    this.setState({
+      userLogged: false,
+      chooseNickname: false
+    });
+  }
+
   // function executed when the Google button is clicked
   googleAuth = async () => {
-    this.setState({spinner: true});
     try {
       const result = await Google.logInAsync({
         androidClientId: ANDROID_AUTH_CLIENT_ID,
@@ -120,21 +127,18 @@ export default class LoginScreen extends React.Component {
         this.checkLoginUser('google', result.user);
       } else {
         console.log(`Google Login Canceled`);
-        this.setState({spinner: false});
       }
     } catch(e) {
       console.log(`Google Login Error: ${e}`);
       this.setState({
         errorMessage: 'Error during login, please try again or choose a different login method.',
-        showErrorMessage: true,
-        spinner: false
+        showErrorMessage: true
       });
     }
   }
 
   // function executed when the Facebook button is clicked
   facebookAuth = async () => {
-    this.setState({spinner: true});
     try {
       const { type, token } = await Facebook.logInWithReadPermissionsAsync(FACEBOOK_APP_ID, {
         permissions: ['public_profile', 'email'],
@@ -147,19 +151,18 @@ export default class LoginScreen extends React.Component {
         this.checkLoginUser('facebook', userInfo);
       } else {
         console.log(`Facebook Login Canceled`);
-        this.setState({spinner: false});
       }
     } catch ({ message }) {
       console.log(`Facebook Login Error: ${message}`);
       this.setState({
         errorMessage: 'Error during login, please try again or choose a different login method.',
-        showErrorMessage: true,
-        spinner: false
+        showErrorMessage: true
       });
     }
   }
 
   checkLoginUser = (prov, userObj) => {
+    this.setState({spinner: true});
     this.provider = prov;
     this.providerid = userObj.id;
     this.preloadNickname = userObj.name.replace(/[^a-z0-9]/gi,''); // nickname only alphanumeric

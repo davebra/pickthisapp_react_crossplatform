@@ -1,7 +1,7 @@
 import React from 'react';
-import { StyleSheet, ScrollView, AsyncStorage } from 'react-native';
+import { StyleSheet, TouchableOpacity, ScrollView, AsyncStorage, Dimensions } from 'react-native';
 import { Icon } from 'expo';
-import { View, Button, Title, Text, TextInput, Caption } from '@shoutem/ui';
+import { View, Image, Button, Title, Text, TextInput, Caption } from '@shoutem/ui';
 import ImagePicker from 'react-native-image-picker';
 import MapView from 'react-native-maps';
 import jwtDecode from 'jwt-decode';
@@ -9,11 +9,21 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import Colors from '../constants/Colors';
 
 export default class AddScreen extends React.Component {
-  state = {
-    userData: {},
-    spinner: false,
-    pictures: []
-  };
+
+  constructor(props){
+    super(props);
+    this.state = {
+      userData: {},
+      spinner: false,
+      pictures: [],
+    };
+
+    this.thingPosition = {
+      latitude: -37.8177025,
+      longitude: 144.9633281,
+    }
+
+  }
 
   static navigationOptions = {
     title: 'Add a new Thing',
@@ -45,6 +55,44 @@ export default class AddScreen extends React.Component {
           textStyle={{color: Colors.darkColor}}
         />
 
+        <View style={styles.pictures}>
+
+          {this.state.pictures.map( (marker, i) => (
+            <View style={styles.pictureCell}>
+              <Image 
+                style={styles.pictureCellImage} 
+                resizeMode='cover'
+                source={require('../assets/images/intro3.png')} />
+          </View>
+          ))}
+
+          <TouchableOpacity 
+            style={(this.state.pictures < 5) ? styles.pictureNewCell : { display: 'none' }} 
+            onPress={this.buttonTakePicture}>
+              <Icon.EvilIcons name="camera" size={96} style={{color: Colors.primaryColor}} />
+          </TouchableOpacity>
+
+        </View>
+
+        <MapView
+          ref="addmap"
+          style={styles.addmap}
+          initialRegion={{
+            latitude: this.thingPosition.latitude,
+            longitude:this.thingPosition.longitude,
+            latitudeDelta: 0.2,
+            longitudeDelta: 0.2,
+          }}
+          loadingEnabled={true}
+          loadingIndicatorColor="#666666"
+          loadingBackgroundColor="#eeeeee"
+          showsUserLocation={false}
+          showsPointsOfInterest={false}
+          onRegionChangeComplete={this.onRegionChangeComplete}
+          >
+            <Icon.MaterialCommunityIcons name="map-marker-outline" size={42} style={{color: Colors.darkColor, marginTop: -21}} />
+          </MapView>
+
       </ScrollView>
     );
   }
@@ -53,19 +101,22 @@ export default class AddScreen extends React.Component {
   getUserLocation = () => {
     navigator.geolocation.getCurrentPosition(
         position => {
-            this.setState({userLocationFound: true});
-            this.refs.map.animateToRegion({
+            this.refs.addmap.animateToRegion({
                 latitude: position.coords.latitude, 
                 longitude: position.coords.longitude, 
-                latitudeDelta: 0.1, 
-                longitudeDelta: 0.1
+                latitudeDelta: 0.002, 
+                longitudeDelta: 0.002
             }, 600);
-            this.loadNewThings = true;
         },
         error => console.log(error.message),
         { enableHighAccuracy: false, timeout: 20000, maximumAge: 1000 }
     );
   };
+
+  onRegionChangeComplete = (region) => {
+    this.thingPosition.latitude =  region.latitude;
+    this.thingPosition.longitude =  region.longitude;
+  }
 
   buttonTakePicture = () => {
     // const options = {
@@ -97,6 +148,8 @@ export default class AddScreen extends React.Component {
 
 }
 
+export const { width, height } = Dimensions.get('window');
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -105,6 +158,53 @@ const styles = StyleSheet.create({
   iconFilter: {
     marginTop: 1,
     marginRight: 5,
-    color: Colors.primaryColor
+    color: Colors.primaryColor,
   },
+  pictures: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  pictureNewCell: {
+    width: width / 2 - 24,
+    height: width / 2 - 36,
+    marginTop: 16,
+    marginLeft: 16,
+    backgroundColor: Colors.lightColor,
+    shadowColor: Colors.darkColor,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.4,
+    borderRadius: 4,
+    shadowRadius: 2,
+    elevation: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  pictureCell: {
+    width: width / 2 - 24,
+    height: width / 2 - 36,
+    marginTop: 16,
+    marginLeft: 16,
+    backgroundColor: Colors.lightColor,
+    shadowColor: Colors.darkColor,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.4,
+    borderRadius: 4,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  pictureCellImage: {
+    width: width / 2 - 24,
+    height: width / 2 - 36,
+
+  },
+  addmap: {
+    marginTop: 20,
+    width: width,
+    height: height * 0.3,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+  }
+  
 });

@@ -23,9 +23,10 @@ export default class HomeScreen extends React.Component {
 
   constructor(props){
     super(props);
+
+    // AsyncStorage.clear();
     
     // property that I need to update the states only when I want
-
     this.moveTheMap = true;
     this.loadNewThings = true;
     this.downloadedThings = [];
@@ -52,8 +53,6 @@ export default class HomeScreen extends React.Component {
 
   // execute immediatly after Home Screen is mounted
   componentDidMount() {
-
-    //AsyncStorage.clear();
 
     // check if is the first time the app is launched
     AsyncStorage.getItem('alreadyLaunched').then( value => {

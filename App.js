@@ -45,6 +45,7 @@ export default class App extends React.Component {
         ...Icon.MaterialIcons.font,
         ...Icon.SimpleLineIcons.font,
         ...Icon.AntDesign.font,
+        ...Icon.EvilIcons.font,
         'Rubik-Black': require('./node_modules/@shoutem/ui/fonts/Rubik-Black.ttf'),
         'Rubik-BlackItalic': require('./node_modules/@shoutem/ui/fonts/Rubik-BlackItalic.ttf'),
         'Rubik-Bold': require('./node_modules/@shoutem/ui/fonts/Rubik-Bold.ttf'),
