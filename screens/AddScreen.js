@@ -1,12 +1,12 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity, ScrollView, AsyncStorage, Dimensions } from 'react-native';
-import { Icon } from 'expo';
-import { View, Image, Button, Title, Text, TextInput, Caption } from '@shoutem/ui';
+import { View, StyleSheet, TouchableOpacity, ScrollView, AsyncStorage, Dimensions, TouchableHighlight, Title, Text, TextInput } from 'react-native';
 import ImagePicker from 'react-native-image-picker';
 import MapView from 'react-native-maps';
 import jwtDecode from 'jwt-decode';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Colors from '../constants/Colors';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import EvilIcons from 'react-native-vector-icons/EvilIcons';
 
 export default class AddScreen extends React.Component {
 
@@ -68,8 +68,8 @@ export default class AddScreen extends React.Component {
 
           <TouchableOpacity 
             style={(this.state.pictures < 5) ? styles.pictureNewCell : { display: 'none' }} 
-            onPress={this.buttonTakePicture}>
-              <Icon.EvilIcons name="camera" size={96} style={{color: Colors.primaryColor}} />
+            onPress={this.TouchableHighlightTakePicture}>
+              <EvilIcons name="camera" size={96} style={{color: Colors.primaryColor}} />
           </TouchableOpacity>
 
         </View>
@@ -90,7 +90,7 @@ export default class AddScreen extends React.Component {
           showsPointsOfInterest={false}
           onRegionChangeComplete={this.onRegionChangeComplete}
           >
-            <Icon.MaterialCommunityIcons name="map-marker-outline" size={42} style={{color: Colors.darkColor, marginTop: -21}} />
+            <MaterialCommunityIcons name="map-marker-outline" size={42} style={{color: Colors.darkColor, marginTop: -21}} />
           </MapView>
 
       </ScrollView>
@@ -118,14 +118,14 @@ export default class AddScreen extends React.Component {
     this.thingPosition.longitude =  region.longitude;
   }
 
-  buttonTakePicture = () => {
+  TouchableHighlightTakePicture = () => {
     // const options = {
     //   title: 'Take or select Picture'
     // };
     // ImagePicker.showImagePicker(options, (response) => {
     //   if (response.didCancel) {}
     //   else if (response.error) {}
-    //   else if (response.customButton) {}
+    //   else if (response.customTouchableHighlight) {}
     //   else {
     //     this.props.addPhoto({
     //       fileName: response.fileName,

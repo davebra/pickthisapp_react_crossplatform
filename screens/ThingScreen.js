@@ -1,12 +1,13 @@
 import React from 'react';
-import { StyleSheet, ScrollView, Dimensions, Image, AsyncStorage, Alert } from 'react-native';
-import { Icon } from 'expo';
-import { Button, Lightbox, Title, Text, View } from '@shoutem/ui';
+import { StyleSheet, ScrollView, Dimensions, Image, AsyncStorage, Alert, TouchableHighlight, Title, Text, View } from 'react-native';
 import SwiperFlatList from 'react-native-swiper-flatlist';
 import { S3_BUCKET_URL } from 'react-native-dotenv';
 import { TagText } from '../components/TagText';
 import { showLocation } from 'react-native-map-link';
-import ActionSheet from 'react-native-actionsheet'
+import ActionSheet from 'react-native-actionsheet';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Entypo from 'react-native-vector-icons/Entypo';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import { changeThingAvailability, changeThingStatus } from '../components/RestApi';
 import Colors from '../constants/Colors';
@@ -33,12 +34,12 @@ export default class ThingScreen extends React.Component {
       paginationStyle={styles.swiperPagination}>
       {this.state.thing.images.map( (image, i) => (
         <View key={i} style={{ width, height: height * 0.5 }}>
-          <Lightbox renderContent={() => { return this.renderLightboxImage(image); }}>
+          {/* <Lightbox renderContent={() => { return this.renderLightboxImage(image); }}> */}
             <Image
               style={{ height: width, height: height * 0.5 }}
               source={{uri: `${S3_BUCKET_URL}${image}`}}
             />
-          </Lightbox>
+          {/* </Lightbox> */}
         </View>
       ))}
       </SwiperFlatList>
@@ -54,42 +55,42 @@ export default class ThingScreen extends React.Component {
             ['low']: ` Something's left`,
             ['empty']: ` Everything's gone`,
         }[this.state.thing.availability]}</Title>
-      <Button 
+      <TouchableHighlight 
         styleName="secondary" 
         onPress={() => { this.driveMeHere(this.state.thing.location.coordinates[1], this.state.thing.location.coordinates[0]) }} 
-        style={styles.oneButton}
+        style={styles.oneTouchableHighlight}
         >
-        <Icon.MaterialCommunityIcons name="car-pickup" style={styles.iconButton} />
+        <MaterialCommunityIcons name="car-pickup" style={styles.iconTouchableHighlight} />
         <Text>PICK THIS THING UP</Text>
-      </Button>
-      <Button 
+      </TouchableHighlight>
+      <TouchableHighlight 
         styleName="secondary" 
         onPress={this.showAvailabilityActionSheet} 
-        style={styles.oneButton}
+        style={styles.oneTouchableHighlight}
         >
-        <Icon.Entypo name="select-arrows" style={styles.iconButton} />
+        <Entypo name="select-arrows" style={styles.iconTouchableHighlight} />
         <Text>UPDATE AVAILABILITY</Text>
-      </Button>
+      </TouchableHighlight>
       <ActionSheet
           ref={o => this.AvailabilityActionSheet = o}
           title={'What is the availability of this thing?'}
           options={['Everything\'s there', 'Most still there', 'Something\'s left', 'Everything\'s gone', 'cancel']}
-          cancelButtonIndex={4}
+          cancelTouchableHighlightIndex={4}
           onPress={(index) => { this.updateAvailability(index) }}
         />
-      <Button 
+      <TouchableHighlight 
         styleName="secondary" 
         onPress={this.showInappropriateActionSheet} 
-        style={styles.buttonReport}
+        style={styles.TouchableHighlightReport}
         >
-        <Icon.MaterialIcons name="report" style={styles.iconButton} />
+        <MaterialIcons name="report" style={styles.iconTouchableHighlight} />
         <Text>REPORT INAPPROPRIATE</Text>
-      </Button>
+      </TouchableHighlight>
       <ActionSheet
           ref={o => this.InappropriateActionSheet = o}
           title={'What do you want to report?'}
           options={['Spam', 'Inappropriate', 'Duplicate', 'cancel']}
-          cancelButtonIndex={3}
+          cancelTouchableHighlightIndex={3}
           onPress={(index) => { this.updateStatus(index) }}
         />
       </ScrollView>
@@ -213,7 +214,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  oneButton: {
+  oneTouchableHighlight: {
     marginBottom: 18,
     marginLeft: 16,
     marginRight: 16,
@@ -221,7 +222,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primaryColor,
     borderColor: Colors.noticeText,
   },
-  buttonReport: {
+  TouchableHighlightReport: {
     marginBottom: 26,
     marginLeft: 16,
     marginRight: 16,
@@ -230,7 +231,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.noticeText,
     color: '#fff'
   },
-  iconButton: {
+  iconTouchableHighlight: {
     fontSize: 22,
     marginRight: 14,
     color: '#fff'

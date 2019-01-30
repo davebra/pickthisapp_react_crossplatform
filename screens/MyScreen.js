@@ -1,7 +1,5 @@
 import React from 'react';
-import { StyleSheet, TouchableHighlight, AsyncStorage, Alert } from 'react-native';
-import { Icon } from 'expo';
-import { Button, Row, Image, Subtitle, Caption, View, Text } from '@shoutem/ui';
+import { StyleSheet, TouchableHighlight, AsyncStorage, Alert, Image, View, Text } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import jwtDecode from 'jwt-decode';
 import Colors from '../constants/Colors';
@@ -9,6 +7,8 @@ import { getUserThings, changeThingStatus } from '../components/RestApi';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { S3_BUCKET_URL } from 'react-native-dotenv';
 import Timestamp from 'react-timestamp';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 export default class MyScreen extends React.Component {
 
@@ -25,10 +25,10 @@ export default class MyScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
     title: 'My Things',
-    headerRight: <Button title='user'
+    headerRight: <TouchableHighlight title='user'
                   onPress={() => { navigation.navigate('Login') }}
                   >
-                    <Icon.FontAwesome 
+                    <FontAwesome 
                     name={'user'} 
                     size={28} 
                     style={{
@@ -36,7 +36,7 @@ export default class MyScreen extends React.Component {
                       marginRight: 12,
                       color: Colors.primaryColor
                     }} />
-                  </Button>
+                  </TouchableHighlight>
     };
   }
 
@@ -68,58 +68,58 @@ export default class MyScreen extends React.Component {
         useFlatList
         style={styles.container}
         data={this.state.userThings}
-        keyExtractor={(rowData, index) => {
+        keyExtractor={(ViewData, index) => {
           return index.toString();
         }}
-        renderItem={ (thing, rowMap) => (
+        renderItem={ (thing, ViewMap) => (
           <TouchableHighlight onPress={() =>{ this.goToThing(thing.item) }}>
             <View>
-            <Row style={{margin: 0}}>
+            <View style={{margin: 0}}>
               <Image
                 styleName="small rounded-corners"
                 source={{uri: `${S3_BUCKET_URL}${thing.item.images[0]}`, cache: 'only-if-cached'}}
               />
             <View styleName="vertical stretch space-between">
-                <Subtitle>Thing of <Timestamp time={thing.item.timestamp} format='full' component={Text} /></Subtitle>
-                <Caption>Status: 
+                <Text>Thing of <Timestamp time={thing.item.timestamp} format='full' component={Text} /></Text>
+                <Text>Status: 
                     {{
                         ['live']: ` Active`,
                         ['paused']: ` Paused`,
                     }[thing.item.status]}
-                </Caption>
+                </Text>
             </View>
-            </Row>
+            </View>
             </View>
           </TouchableHighlight>
         )}
-        renderHiddenItem={ (thing, rowMap) => (
-            <View style={styles.rowBack}>
-              <Button 
+        renderHiddenItem={ (thing, ViewMap) => (
+            <View style={styles.ViewBack}>
+              <TouchableHighlight 
               styleName="stacked clear" 
               onPress={ () => {
-                rowMap[thing.index].manuallySwipeRow(0);
+                ViewMap[thing.index].manuallySwipeView(0);
                 this.clickPauseThing( thing.item._id, (thing.item.status === 'live' ) ? 'paused' : 'live' )
               }}
-              style={styles.buttonPlayPause}>
+              style={styles.TouchableHighlightPlayPause}>
                   {{
-                      ['live']: <Icon.MaterialCommunityIcons name="pause" size={20} />,
-                      ['paused']: <Icon.MaterialCommunityIcons name="play" size={20} />,
+                      ['live']: <MaterialCommunityIcons name="pause" size={20} />,
+                      ['paused']: <MaterialCommunityIcons name="play" size={20} />,
                   }[thing.item.status]}
                   {{
                       ['live']: <Text>Pause</Text>,
                       ['paused']: <Text>Resume</Text>,
                   }[thing.item.status]}
-              </Button>
-              <Button 
+              </TouchableHighlight>
+              <TouchableHighlight 
                 styleName="stacked clear"  
-                style={styles.buttonDelete}
+                style={styles.TouchableHighlightDelete}
                 onPress={ () => {
-                  rowMap[thing.index].manuallySwipeRow(0);
+                  ViewMap[thing.index].manuallySwipeView(0);
                   this.clickDeleteThing( thing.item._id )
                 }}>
-                <Icon.FontAwesome name="trash-o" style={{color: Colors.lightColor}} size={20} />
+                <FontAwesome name="trash-o" style={{color: Colors.lightColor}} size={20} />
                 <Text style={{color: Colors.lightColor}}>Delete</Text>
-              </Button>
+              </TouchableHighlight>
             </View>
         )}
         disableRightSwipe={true}
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  rowBack: {
+  ViewBack: {
     flexDirection: 'row',
     justifyContent: 'flex-end'
   },
@@ -195,11 +195,11 @@ const styles = StyleSheet.create({
     marginRight: 5,
     color: Colors.primaryColor
   },
-  buttonPlayPause:{
+  TouchableHighlightPlayPause:{
     backgroundColor: Colors.tabIconDefault,
     width: 80,
   },
-  buttonDelete:{
+  TouchableHighlightDelete:{
     backgroundColor: Colors.dangerColor,
     width: 80,
   }

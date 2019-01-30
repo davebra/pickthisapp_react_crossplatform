@@ -1,6 +1,5 @@
 import React from 'react';
-import {StyleSheet, Dimensions, AsyncStorage } from 'react-native';
-import { Subtitle, Heading, Image, Button, View, Text } from '@shoutem/ui';
+import {StyleSheet, Dimensions, Image, TouchableHighlight, View, Text } from 'react-native';
 
 export default class PublishedScreen extends React.Component {
     static navigationOptions = {
@@ -24,12 +23,12 @@ export default class PublishedScreen extends React.Component {
                 resizeMode='contain'
                 source={require('../assets/images/intro3.png')} />
             </View>
-            <Heading style={styles.pubTitle}>Thing Published!!</Heading>
-            <Subtitle style={styles.pubText}>Thanks {this.state.nickname}! This items has been published and is live! Everybody can see it and, if they need it, pick this up!</Subtitle>
+            <Text style={styles.pubTitle}>Thing Published!!</Text>
+            <Text style={styles.pubText}>Thanks {this.state.nickname}! This items has been published and is live! Everybody can see it and, if they need it, pick this up!</Text>
             <View style={styles.skipContainer}>
-            <Button styleName="stacked clear" onPress={() => { this.props.navigation.goBack(); }}>
+            <TouchableHighlight styleName="stacked clear" onPress={() => { this.props.navigation.goBack(); }}>
                 <Text>Back to add another Thing</Text>
-            </Button>
+            </TouchableHighlight>
             </View>
         </View>
       </View>

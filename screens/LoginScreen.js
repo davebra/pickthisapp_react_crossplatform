@@ -1,7 +1,5 @@
 import React from 'react';
-import { StyleSheet, AsyncStorage } from 'react-native';
-import { Icon, Google, Facebook } from 'expo';
-import { View, Button, Title, Text, TextInput, Caption } from '@shoutem/ui';
+import { StyleSheet, AsyncStorage, View, TouchableHighlight, Text, TextInput } from 'react-native';
 import { 
   ANDROID_AUTH_CLIENT_ID, 
   IOS_AUTH_CLIENT_ID, 
@@ -14,6 +12,10 @@ import jwtDecode from 'jwt-decode';
 import { ScrollView } from 'react-native-gesture-handler';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Colors from '../constants/Colors';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import Entypo from 'react-native-vector-icons/Entypo';
 
 export default class LoginScreen extends React.Component {
   state = {
@@ -47,52 +49,51 @@ export default class LoginScreen extends React.Component {
       <ScrollView contentContainerStyle={styles.container}>
         <Spinner
           visible={this.state.spinner}
-          textContent={'Loading...'}
+          TextContent={'Loading...'}
           color={Colors.darkColor}
-          textStyle={{color: Colors.darkColor}}
+          TextStyle={{color: Colors.darkColor}}
         />
         
         {!this.state.userLogged ? (
           <View style={styles.loginContainer}>
-            <Title style={styles.loginTitle}>Want to post something on PickThisApp?</Title>
-            <Button styleName="secondary" style={styles.googleLoginTouchable} onPress={this.googleAuth}>
-              <Icon.FontAwesome name="google-plus" style={styles.iconButton} />
+            <Text style={styles.loginTitle}>Want to post something on PickThisApp?</Text>
+            <TouchableHighlight styleName="secondary" style={styles.googleLoginTouchable} onPress={this.googleAuth}>
+              <FontAwesome name="google-plus" style={styles.iconTouchableHighlight} />
               <Text>JOIN WITH GOOGLE</Text>
-            </Button>
-            <Button styleName="secondary" style={styles.facebookLoginButton} onPress={this.facebookAuth}>
-              <Icon.FontAwesome name="facebook" style={styles.iconButton} />
+            </TouchableHighlight>
+            <TouchableHighlight styleName="secondary" style={styles.facebookLoginTouchableHighlight} onPress={this.facebookAuth}>
+              <FontAwesome name="facebook" style={styles.iconTouchableHighlight} />
               <Text>JOIN WITH FACEBOOK</Text>
-            </Button>
+            </TouchableHighlight>
           </View>
         ) : (
           this.state.chooseNickname ? (
             <View style={styles.loginContainer}>
-              <Title style={styles.loginTitle}>Choose a nickname</Title>
+              <Text style={styles.loginTitle}>Choose a nickname</Text>
               <TextInput
                 placeholder={'Nickname'}
                 onChangeText={(nickname) => this.setState({nickname})}
                 value={this.state.nickname}
               />
-              <Button 
+              <TouchableHighlight 
                 styleName="secondary" 
                 style={styles.confirmNickname} 
-                onPress={this.checkSignupUser} 
-                muted>
-              <Icon.Entypo name="check" style={styles.iconButton} />
+                onPress={this.checkSignupUser}>
+              <Entypo name="check" style={styles.iconTouchableHighlight} />
               <Text>COMPLETE SIGNUP</Text>
-            </Button>
+            </TouchableHighlight>
             </View>
           ) : (
             <View style={styles.loginContainer}>
-              <Title style={styles.loginTitle}>Hey {this.state.userData.nickname}!</Title>
-              <Button style={styles.logoutTouchable} onPress={this.executeLogout}>
-                <Icon.SimpleLineIcons name="logout" style={styles.logoutIconButton} />
+              <Text style={styles.loginTitle}>Hey {this.state.userData.nickname}!</Text>
+              <TouchableHighlight style={styles.logoutTouchable} onPress={this.executeLogout}>
+                <SimpleLineIcons name="logout" style={styles.logoutIconTouchableHighlight} />
                 <Text>I WANT TO LOGOUT</Text>
-              </Button>
-              <Button styleName="secondary" onPress={()=>{this.props.navigation.goBack()}}>
-                <Icon.AntDesign name="back" style={styles.iconButton} />
+              </TouchableHighlight>
+              <TouchableHighlight styleName="secondary" onPress={()=>{this.props.navigation.goBack()}}>
+                <AntDesign name="back" style={styles.iconTouchableHighlight} />
                 <Text>BACK TO YOUR THINGS</Text>
-              </Button>
+              </TouchableHighlight>
             </View>
           )
         )}
@@ -100,7 +101,7 @@ export default class LoginScreen extends React.Component {
         <Text style={
           this.state.showErrorMessage ? (styles.errorMessage) : ({display: 'none'}) }>{this.state.errorMessage}</Text>
 
-        <Caption style={styles.loginBottomText}>We will never spam, you, that's a promise!</Caption>
+        <Text style={styles.loginBottomText}>We will never spam, you, that's a promise!</Text>
       </ScrollView>
     );
   }
@@ -113,7 +114,7 @@ export default class LoginScreen extends React.Component {
     });
   }
 
-  // function executed when the Google button is clicked
+  // function executed when the Google TouchableHighlight is clicked
   googleAuth = async () => {
     try {
       const result = await Google.logInAsync({
@@ -137,7 +138,7 @@ export default class LoginScreen extends React.Component {
     }
   }
 
-  // function executed when the Facebook button is clicked
+  // function executed when the Facebook TouchableHighlight is clicked
   facebookAuth = async () => {
     try {
       const { type, token } = await Facebook.logInWithReadPermissionsAsync(FACEBOOK_APP_ID, {
@@ -243,7 +244,7 @@ const styles = StyleSheet.create({
     alignItems: 'stretch',
     padding: 16
   },
-  iconButton: {
+  iconTouchableHighlight: {
     fontSize: 22,
     marginRight: 14,
     color: '#fff'
@@ -256,7 +257,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 26
   },
-  facebookLoginButton: {
+  facebookLoginTouchableHighlight: {
     marginTop: 16,
   },
   confirmNickname: {
@@ -265,7 +266,7 @@ const styles = StyleSheet.create({
   logoutTouchable: {
     marginBottom: 16
   },
-  logoutIconButton: {
+  logoutIconTouchableHighlight: {
     fontSize: 22,
     marginRight: 14,
     color: '#000'

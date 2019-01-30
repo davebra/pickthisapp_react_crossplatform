@@ -1,5 +1,5 @@
 import { AsyncStorage } from 'react-native';
-import { RESTAPI_URL, S3_BUCKET_URL } from 'react-native-dotenv';
+import { RESTAPI_URL } from 'react-native-dotenv';
 
 export async function getThings(latitude, longitude, radius) {
     return new Promise((resolve, reject) => {

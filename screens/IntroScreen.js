@@ -1,6 +1,5 @@
 import React from 'react';
-import {StyleSheet, Dimensions, AsyncStorage } from 'react-native';
-import { Subtitle, Heading, Image, Button, View, Text } from '@shoutem/ui';
+import {StyleSheet, Dimensions, AsyncStorage, Image, TouchableHighlight, View, Text } from 'react-native';
 import SwiperFlatList from 'react-native-swiper-flatlist';
 
 export default class IntroScreen extends React.Component {
@@ -21,12 +20,12 @@ export default class IntroScreen extends React.Component {
                   resizeMode='contain'
                   source={require('../assets/images/intro1.png')} />
               </View>
-              <Heading style={styles.introTitle}>Find things for free!</Heading>
-              <Subtitle style={styles.introText}>With PickThisApp you can find free things around you, owned or just found by other Pick-appers.</Subtitle>
+              <Text style={styles.introTitle}>Find things for free!</Text>
+              <Text style={styles.introText}>With PickThisApp you can find free things around you, owned or just found by other Pick-appers.</Text>
               <View style={styles.skipContainer}>
-                <Button styleName="stacked clear" onPress={this.closeIntro}>
+                <TouchableHighlight styleName="stacked clear" onPress={this.closeIntro}>
                   <Text>Skip Intro</Text>
-                </Button>
+                </TouchableHighlight>
               </View>
             </View>
             <View style={styles.introSlide}>
@@ -36,12 +35,12 @@ export default class IntroScreen extends React.Component {
                   resizeMode='contain'
                   source={require('../assets/images/intro2.png')} />
               </View>
-              <Heading style={styles.introTitle}>Be the first to pick up!</Heading>
-              <Subtitle style={styles.introText}>When you find something interesting and you want to get there, tap "Drive me here" to start your navigator.</Subtitle>
+              <Text style={styles.introTitle}>Be the first to pick up!</Text>
+              <Text style={styles.introText}>When you find something interesting and you want to get there, tap "Drive me here" to start your navigator.</Text>
               <View style={styles.skipContainer}>
-                <Button styleName="stacked clear" onPress={this.closeIntro}>
+                <TouchableHighlight styleName="stacked clear" onPress={this.closeIntro}>
                   <Text>Skip Intro</Text>
-                </Button>
+                </TouchableHighlight>
               </View>
             </View>
             <View style={styles.introSlide}>
@@ -51,12 +50,12 @@ export default class IntroScreen extends React.Component {
                   resizeMode='contain'
                   source={require('../assets/images/intro3.png')} />
               </View>
-              <Heading style={styles.introTitle}>Want to post free things?</Heading>
-              <Subtitle style={styles.introText}>Do you have something you want to give for free or you just found something on nature strip? Post a thing here is super easy! Take a picture, adjust the position, and post!</Subtitle>
+              <Text style={styles.introTitle}>Want to post free things?</Text>
+              <Text style={styles.introText}>Do you have something you want to give for free or you just found something on nature strip? Post a thing here is super easy! Take a picture, adjust the position, and post!</Text>
               <View style={styles.skipContainer}>
-                <Button styleName="stacked clear" onPress={this.closeIntro}>
+                <TouchableHighlight styleName="stacked clear" onPress={this.closeIntro}>
                   <Text>Skip Intro</Text>
-                </Button>
+                </TouchableHighlight>
               </View>
             </View>
         </SwiperFlatList>

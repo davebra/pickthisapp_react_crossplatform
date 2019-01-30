@@ -1,11 +1,10 @@
 import React from 'react';
-import { TouchableOpacity, Picker, AsyncStorage } from 'react-native';
-import { Button, Row, Image, Subtitle, Caption, View, Text } from '@shoutem/ui';
-import { Icon } from 'expo';
+import { TouchableOpacity, Picker, AsyncStorage, TouchableHighlight, Image, Text, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import Popover from 'react-native-popover-view';
 import SwiperFlatList from 'react-native-swiper-flatlist';
 import { S3_BUCKET_URL } from 'react-native-dotenv';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { TagText } from '../components/TagText';
 import styles from './HomeScreen.styles.js';
@@ -32,7 +31,7 @@ export default class HomeScreen extends React.Component {
     this.downloadedThings = [];
   }
 
-  // set the header navigator options, with the filter button
+  // set the header navigator options, with the filter TouchableHighlight
   static navigationOptions = ({ navigation }) => {
     const { params = {} } = navigation.state;
     return {
@@ -42,12 +41,12 @@ export default class HomeScreen extends React.Component {
           <Image source={require('../assets/images/logotop.png')} />
         </View>
       ),
-      headerRight: <Button onPress={params.openFilters} title='filter'>
-                    <Icon.MaterialCommunityIcons 
+      headerRight: <TouchableHighlight onPress={params.openFilters} title='filter'>
+                    <MaterialCommunityIcons 
                     name={'filter'} 
                     size={28} 
                     style={styles.iconFilter} />
-                  </Button>
+                  </TouchableHighlight>
     }
   };
 
@@ -125,7 +124,6 @@ export default class HomeScreen extends React.Component {
         onMomentumScrollEnd={this.onSlideSwiper}>
           {this.state.thingsMarkers.map( (marker, i) => (
             <View key={i} style={this.showBasedOnAvailability(marker.availability) ? styles.thingSlide : {display: 'none'}}>
-            <Row styleName="rounded-corners">
             <TouchableOpacity onPress={() => { this.goToThing(i) }}>
               <Image
                 styleName="medium rounded-corners"
@@ -133,22 +131,21 @@ export default class HomeScreen extends React.Component {
               />
             </TouchableOpacity>
             <View styleName="vertical stretch space-between">
-                <Subtitle>Here there are:</Subtitle>
+                <Text>Here there are:</Text>
                 <View styleName="horizontal flex-start">
                     {marker.tags.map( (tag, j) => (
                     <TagText key={j}>{tag}</TagText>
                     ))}
                 </View>
-                <Caption>Availability: 
+                <Text>Availability: 
                     {{
                         ['full']: ` Great!`,
                         ['medium']: ` Good`,
                         ['low']: ` Something's left`,
                         ['empty']: ` Gone`,
                     }[marker.availability]}
-                </Caption>
+                </Text>
             </View>
-            </Row>
             </View>
           ))}         
         </SwiperFlatList>
