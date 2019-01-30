@@ -6,7 +6,6 @@
  */
 
 #import <UIKit/UIKit.h>
-#import "RNGoogleSignin.h"
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 

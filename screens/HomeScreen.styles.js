@@ -49,29 +49,24 @@ export default StyleSheet.create({
     height: height * 0.2,
     top: 16,
     left: 16,
-    borderRadius: 4,
-    overflow: 'hidden',
   },
   thingSlide: {
     width: width - 32,
     height: height * 0.2,
-    backgroundColor: '#fbfbfb',
+  },
+  thingSlideContent: {
     flexDirection: 'row',
+    justifyContent: 'space-evenly'
   },
   thingSlideImage: {
     width: height * 0.2 - 32,
-    height: height * 0.2 - 32,    
-  },
-  thingSlideRight: {
-    flexDirection: 'column'    
-  },
-  thingSlideText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    textAlign: 'center',
+    height: height * 0.2 - 48,
+    margin: 16,
+    borderRadius: 4,    
   },
   tagsContainer: {
-    flexDirection: 'row'    
+    flexDirection: 'row',
+    justifyContent: "flex-start",   
   },
 });
   

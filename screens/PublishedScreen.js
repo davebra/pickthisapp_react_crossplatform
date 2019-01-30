@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, Dimensions, Image, View, Text } from 'react-native';
+import {StyleSheet, Dimensions, Image, View } from 'react-native';
 import { Button, Text } from 'native-base';
 
 export default class PublishedScreen extends React.Component {

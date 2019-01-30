@@ -1,14 +1,11 @@
 import React from 'react';
 import { StyleSheet, ScrollView, Dimensions, Image, AsyncStorage, Alert, View } from 'react-native';
-import { Button, Text } from 'native-base';
+import { Button, Text, H2, H3, Icon } from 'native-base';
 import SwiperFlatList from 'react-native-swiper-flatlist';
 import { S3_BUCKET_URL } from 'react-native-dotenv';
 import { TagText } from '../components/TagText';
 import { showLocation } from 'react-native-map-link';
 import ActionSheet from 'react-native-actionsheet';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Entypo from 'react-native-vector-icons/Entypo';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import { changeThingAvailability, changeThingStatus } from '../components/RestApi';
 import Colors from '../constants/Colors';
@@ -44,31 +41,32 @@ export default class ThingScreen extends React.Component {
         </View>
       ))}
       </SwiperFlatList>
-      <Title style={styles.thingTitle}>What's in here:</Title>
-      <View styleName="horizontal h-start" style={styles.tagsContainer}>
+      <H2 style={styles.thingTitle}>What's in here:</H2>
+      <View style={styles.tagsContainer}>
           {this.state.thing.tags.map( (tag, j) => (
           <TagText key={j} style={{fontSize: 18}}>{tag}</TagText>
           ))}
       </View>
-      <Title style={styles.thingAvailability}>Availability: {{
+      <H3 style={styles.thingAvailability}>Availability: {{
             ['full']: ` Everything's there!`,
             ['medium']: ` Most things still there`,
             ['low']: ` Something's left`,
             ['empty']: ` Everything's gone`,
-        }[this.state.thing.availability]}</Title>
+        }[this.state.thing.availability]}</H3>
       <Button 
+        iconLeft block
         onPress={() => { this.driveMeHere(this.state.thing.location.coordinates[1], this.state.thing.location.coordinates[0]) }} 
-        style={styles.oneTouchableHighlight}
+        style={styles.oneButton}
         >
-        <MaterialCommunityIcons name="car-pickup" style={styles.iconTouchableHighlight} />
+        <Icon type='MaterialCommunityIcons' name="car-pickup" style={styles.iconButton} />
         <Text>PICK THIS THING UP</Text>
       </Button>
       <Button 
-        styleName="secondary" 
+        iconLeft block 
         onPress={this.showAvailabilityActionSheet} 
-        style={styles.oneTouchableHighlight}
+        style={styles.oneButton}
         >
-        <Entypo name="select-arrows" style={styles.iconTouchableHighlight} />
+        <Icon type='Entypo' name="select-arrows" style={styles.iconButton} />
         <Text>UPDATE AVAILABILITY</Text>
       </Button>
       <ActionSheet
@@ -79,11 +77,11 @@ export default class ThingScreen extends React.Component {
           onPress={(index) => { this.updateAvailability(index) }}
         />
       <Button 
-        styleName="secondary" 
+        iconLeft block 
         onPress={this.showInappropriateActionSheet} 
-        style={styles.TouchableHighlightReport}
+        style={styles.buttonReport}
         >
-        <MaterialIcons name="report" style={styles.iconTouchableHighlight} />
+        <Icon type='MaterialIcons' name="report" style={styles.iconButton} />
         <Text>REPORT INAPPROPRIATE</Text>
       </Button>
       <ActionSheet
@@ -214,7 +212,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  oneTouchableHighlight: {
+  oneButton: {
     marginBottom: 18,
     marginLeft: 16,
     marginRight: 16,
@@ -222,7 +220,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primaryColor,
     borderColor: Colors.noticeText,
   },
-  TouchableHighlightReport: {
+  buttonReport: {
     marginBottom: 26,
     marginLeft: 16,
     marginRight: 16,
@@ -231,12 +229,14 @@ const styles = StyleSheet.create({
     borderColor: Colors.noticeText,
     color: '#fff'
   },
-  iconTouchableHighlight: {
+  iconButton: {
     fontSize: 22,
-    marginRight: 14,
+    marginRight: 10,
     color: '#fff'
   },
   tagsContainer:{
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
     marginTop: 12,
     paddingLeft: 16,
     paddingRight: 16,

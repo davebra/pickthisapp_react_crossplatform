@@ -1,11 +1,10 @@
 import React from 'react';
-import { TouchableOpacity, Picker, TouchableHighlight, AsyncStorage, Image, View } from 'react-native';
-import { Container, Text, Icon } from 'native-base';
+import { TouchableOpacity, Picker, AsyncStorage, Image, View } from 'react-native';
+import { Content, Text, Icon, Card, CardItem, Body } from 'native-base';
 import MapView, { Marker } from 'react-native-maps';
 import Popover from 'react-native-popover-view';
 import SwiperFlatList from 'react-native-swiper-flatlist';
 import { S3_BUCKET_URL } from 'react-native-dotenv';
-
 import { TagText } from '../components/TagText';
 import styles from './HomeScreen.styles.js';
 import { getThings } from '../components/RestApi';
@@ -41,13 +40,13 @@ export default class HomeScreen extends React.Component {
           <Image source={require('../assets/images/logotop.png')} />
         </View>
       ),
-      headerRight: <TouchableHighlight onPress={params.openFilters} title='filter'>
+      headerRight: <TouchableOpacity onPress={params.openFilters} title='filter'>
                     <Icon 
                     type='MaterialCommunityIcons' 
                     name={'filter'} 
                     size={28} 
                     style={styles.iconFilter} />
-                  </TouchableHighlight>
+                  </TouchableOpacity>
     }
   };
 
@@ -125,28 +124,38 @@ export default class HomeScreen extends React.Component {
         onMomentumScrollEnd={this.onSlideSwiper}>
           {this.state.thingsMarkers.map( (marker, i) => (
             <View key={i} style={this.showBasedOnAvailability(marker.availability) ? styles.thingSlide : {display: 'none'}}>
-            <TouchableOpacity onPress={() => { this.goToThing(i) }}>
-              <Image
-                styleName="medium rounded-corners"
-                source={{uri: `${S3_BUCKET_URL}${marker.images[0]}`, cache: 'only-if-cached'}}
-              />
-            </TouchableOpacity>
-            <View styleName="vertical stretch space-between">
-                <Text>Here there are:</Text>
-                <View styleName="horizontal flex-start">
-                    {marker.tags.map( (tag, j) => (
-                    <TagText key={j}>{tag}</TagText>
-                    ))}
-                </View>
-                <Text>Availability: 
-                    {{
-                        ['full']: ` Great!`,
-                        ['medium']: ` Good`,
-                        ['low']: ` Something's left`,
-                        ['empty']: ` Gone`,
-                    }[marker.availability]}
-                </Text>
-            </View>
+            <Card onPress={() => { this.goToThing(i) }}>
+              <View style={styles.thingSlideContent}>
+                <TouchableOpacity onPress={() => { this.goToThing(i) }}>
+                  <Image
+                    style={styles.thingSlideImage}
+                    source={{uri: `${S3_BUCKET_URL}${marker.images[0]}`}}
+                  />
+                </TouchableOpacity>
+                <Content style={styles.thingSlideRight}>
+                    <CardItem header>
+                    <Text>Here there are:</Text>
+                    </CardItem>
+                    <CardItem>
+                      <Body style={styles.tagsContainer}>
+                        {marker.tags.map( (tag, j) => (
+                        <TagText key={j}>{tag}</TagText>
+                        ))}
+                      </Body>
+                    </CardItem>
+                    <CardItem footer>
+                    <Text note>Availability: 
+                      {{
+                          ['full']: ` Great!`,
+                          ['medium']: ` Good`,
+                          ['low']: ` Something's left`,
+                          ['empty']: ` Gone`,
+                      }[marker.availability]}
+                    </Text>
+                  </CardItem>
+                </Content>
+              </View>
+            </Card>
             </View>
           ))}         
         </SwiperFlatList>

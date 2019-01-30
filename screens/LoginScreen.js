@@ -1,14 +1,12 @@
 import React from 'react';
-import { StyleSheet, AsyncStorage, View, TextInput } from 'react-native';
-import { Icon, Button, Text } from 'native-base';
-import { GOOGLE_AUTH_WEB_CLIENT_ID, GOOGLE_AUTH_IOS_CLIENT_ID } from 'react-native-dotenv';
+import { StyleSheet, AsyncStorage, View, TextInput, ScrollView } from 'react-native';
+import { Icon, Button, Text, H2 } from 'native-base';
 import { loginUser, signupUser } from '../components/RestApi';
 import jwtDecode from 'jwt-decode';
-import { ScrollView } from 'react-native-gesture-handler';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Colors from '../constants/Colors';
-import { LoginManager } from 'react-native-fbsdk';
-import { GoogleSignin, statusCodes } from 'react-native-google-signin';
+//import { LoginManager } from 'react-native-fbsdk';
+//import { GoogleSignin, statusCodes } from 'react-native-google-signin';
 
 export default class LoginScreen extends React.Component {
   state = {
@@ -22,13 +20,13 @@ export default class LoginScreen extends React.Component {
   // execute immediatly after Login Screen is mounted
   componentDidMount() {
 
-    GoogleSignin.configure({
-      webClientId: GOOGLE_AUTH_WEB_CLIENT_ID,
-      offlineAccess: false,
-      forceConsentPrompt: false,
-      accountName: '', // [Android] specifies an account name on the device that should be used
-      iosClientId: GOOGLE_AUTH_IOS_CLIENT_ID,
-    });
+    // GoogleSignin.configure({
+    //   webClientId: GOOGLE_AUTH_WEB_CLIENT_ID,
+    //   offlineAccess: false,
+    //   forceConsentPrompt: false,
+    //   accountName: '', // [Android] specifies an account name on the device that should be used
+    //   iosClientId: GOOGLE_AUTH_IOS_CLIENT_ID,
+    // });
 
     // check if is the user is already logged in
     AsyncStorage.getItem('userToken').then( value => {
@@ -57,12 +55,12 @@ export default class LoginScreen extends React.Component {
         
         {!this.state.userLogged ? (
           <View style={styles.loginContainer}>
-            <Text style={styles.loginTitle}>Want to post something on PickThisApp?</Text>
-            <Button iconLeft style={styles.googleLoginTouchable} onPress={this.googleAuth}>
+            <H2 style={styles.loginTitle}>Do you want to post or update a thing on PickThisApp?</H2>
+            <Button iconLeft block style={styles.colorButton} onPress={this.googleAuth}>
               <Icon type='FontAwesome' name="google-plus" style={styles.iconTouchableHighlight} />
               <Text>JOIN WITH GOOGLE</Text>
             </Button>
-            <Button iconLeft style={styles.facebookLoginTouchableHighlight} onPress={this.facebookAuth}>
+            <Button iconLeft block style={[styles.colorButton, styles.facebookLoginButton]} onPress={this.facebookAuth}>
               <Icon type='FontAwesome' name="facebook" style={styles.iconTouchableHighlight} />
               <Text>JOIN WITH FACEBOOK</Text>
             </Button>
@@ -76,7 +74,7 @@ export default class LoginScreen extends React.Component {
                 onChangeText={(nickname) => this.setState({nickname})}
                 value={this.state.nickname}
               />
-              <Button iconLeft style={styles.confirmNickname} onPress={this.checkSignupUser}>
+              <Button iconLeft block style={[styles.colorButton, styles.confirmNickname]} onPress={this.checkSignupUser}>
               <Icon type='Entypo' name="check" style={styles.iconTouchableHighlight} />
               <Text>COMPLETE SIGNUP</Text>
             </Button>
@@ -84,11 +82,11 @@ export default class LoginScreen extends React.Component {
           ) : (
             <View style={styles.loginContainer}>
               <Text style={styles.loginTitle}>Hey {this.state.userData.nickname}!</Text>
-              <Button iconLeft style={styles.logoutTouchable} onPress={this.executeLogout}>
-                <Icon type='SimpleLineIcons' name="logout" style={styles.logoutIconTouchableHighlight} />
+              <Button iconLeft block light style={styles.logoutButton} onPress={this.executeLogout}>
+                <Icon type='SimpleLineIcons' name="logout" style={styles.logoutIconButton} />
                 <Text>I WANT TO LOGOUT</Text>
               </Button>
-              <Button iconLeft styleName="secondary" onPress={()=>{this.props.navigation.goBack()}}>
+              <Button iconLeft block style={styles.colorButton} onPress={()=>{this.props.navigation.goBack()}}>
                 <Icon type='AntDesign' name="back" style={styles.iconTouchableHighlight} />
                 <Text>BACK TO YOUR THINGS</Text>
               </Button>
@@ -244,12 +242,13 @@ const styles = StyleSheet.create({
   loginContainer: {
     flexDirection: 'column',
     justifyContent: 'center',
-    alignItems: 'stretch',
-    padding: 16
+    alignItems: 'center',
+    padding: 16,
+    textAlign: 'center'
   },
   iconTouchableHighlight: {
     fontSize: 22,
-    marginRight: 14,
+    marginRight: 10,
     color: '#fff'
   },
   loginTitle: {
@@ -260,16 +259,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 26
   },
-  facebookLoginTouchableHighlight: {
+  colorButton: {
+    backgroundColor: Colors.primaryColor,
+    borderColor: Colors.primaryColor,
+  },
+  facebookLoginButton: {
     marginTop: 16,
   },
   confirmNickname: {
     marginTop: 16,
   },
-  logoutTouchable: {
+  logoutButton: {
     marginBottom: 16
   },
-  logoutIconTouchableHighlight: {
+  logoutIconButton: {
     fontSize: 22,
     marginRight: 14,
     color: '#000'

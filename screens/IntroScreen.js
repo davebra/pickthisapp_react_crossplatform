@@ -1,6 +1,6 @@
 import React from 'react';
 import {StyleSheet, Dimensions, AsyncStorage, Image, View } from 'react-native';
-import { Button, Text } from 'native-base';
+import { Button, Text, H1 } from 'native-base';
 
 import SwiperFlatList from 'react-native-swiper-flatlist';
 
@@ -22,7 +22,7 @@ export default class IntroScreen extends React.Component {
                   resizeMode='contain'
                   source={require('../assets/images/intro1.png')} />
               </View>
-              <Text style={styles.introTitle}>Find things for free!</Text>
+              <H1 style={styles.introTitle}>Find things for free!</H1>
               <Text style={styles.introText}>With PickThisApp you can find free things around you, owned or just found by other Pick-appers.</Text>
               <View style={styles.skipContainer}>
                 <Button transparent dark onPress={this.closeIntro}>
@@ -37,7 +37,7 @@ export default class IntroScreen extends React.Component {
                   resizeMode='contain'
                   source={require('../assets/images/intro2.png')} />
               </View>
-              <Text style={styles.introTitle}>Be the first to pick up!</Text>
+              <H1 style={styles.introTitle}>Be the first to pick up!</H1>
               <Text style={styles.introText}>When you find something interesting and you want to get there, tap "Drive me here" to start your navigator.</Text>
               <View style={styles.skipContainer}>
                 <Button transparent dark onPress={this.closeIntro}>
@@ -52,7 +52,7 @@ export default class IntroScreen extends React.Component {
                   resizeMode='contain'
                   source={require('../assets/images/intro3.png')} />
               </View>
-              <Text style={styles.introTitle}>Want to post free things?</Text>
+              <H1 style={styles.introTitle}>Want to post free things?</H1>
               <Text style={styles.introText}>Do you have something you want to give for free or you just found something on nature strip? Post a thing here is super easy! Take a picture, adjust the position, and post!</Text>
               <View style={styles.skipContainer}>
                 <Button transparent dark onPress={this.closeIntro}>

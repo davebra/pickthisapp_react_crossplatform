@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, TouchableHighlight, AsyncStorage, Alert, Image, View, Text } from 'react-native';
+import { StyleSheet, TouchableHighlight, AsyncStorage, Alert, Image, View } from 'react-native';
 import { Icon, Button, Text } from 'native-base';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import jwtDecode from 'jwt-decode';
