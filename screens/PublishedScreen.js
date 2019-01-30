@@ -1,5 +1,6 @@
 import React from 'react';
-import {StyleSheet, Dimensions, Image, TouchableHighlight, View, Text } from 'react-native';
+import {StyleSheet, Dimensions, Image, View, Text } from 'react-native';
+import { Button, Text } from 'native-base';
 
 export default class PublishedScreen extends React.Component {
     static navigationOptions = {
@@ -26,9 +27,9 @@ export default class PublishedScreen extends React.Component {
             <Text style={styles.pubTitle}>Thing Published!!</Text>
             <Text style={styles.pubText}>Thanks {this.state.nickname}! This items has been published and is live! Everybody can see it and, if they need it, pick this up!</Text>
             <View style={styles.skipContainer}>
-            <TouchableHighlight styleName="stacked clear" onPress={() => { this.props.navigation.goBack(); }}>
+            <Button transparent dark onPress={() => { this.props.navigation.goBack(); }}>
                 <Text>Back to add another Thing</Text>
-            </TouchableHighlight>
+            </Button>
             </View>
         </View>
       </View>

@@ -1,5 +1,7 @@
 import React from 'react';
-import {StyleSheet, Dimensions, AsyncStorage, Image, TouchableHighlight, View, Text } from 'react-native';
+import {StyleSheet, Dimensions, AsyncStorage, Image, View } from 'react-native';
+import { Button, Text } from 'native-base';
+
 import SwiperFlatList from 'react-native-swiper-flatlist';
 
 export default class IntroScreen extends React.Component {
@@ -23,9 +25,9 @@ export default class IntroScreen extends React.Component {
               <Text style={styles.introTitle}>Find things for free!</Text>
               <Text style={styles.introText}>With PickThisApp you can find free things around you, owned or just found by other Pick-appers.</Text>
               <View style={styles.skipContainer}>
-                <TouchableHighlight styleName="stacked clear" onPress={this.closeIntro}>
+                <Button transparent dark onPress={this.closeIntro}>
                   <Text>Skip Intro</Text>
-                </TouchableHighlight>
+                </Button>
               </View>
             </View>
             <View style={styles.introSlide}>
@@ -38,9 +40,9 @@ export default class IntroScreen extends React.Component {
               <Text style={styles.introTitle}>Be the first to pick up!</Text>
               <Text style={styles.introText}>When you find something interesting and you want to get there, tap "Drive me here" to start your navigator.</Text>
               <View style={styles.skipContainer}>
-                <TouchableHighlight styleName="stacked clear" onPress={this.closeIntro}>
+                <Button transparent dark onPress={this.closeIntro}>
                   <Text>Skip Intro</Text>
-                </TouchableHighlight>
+                </Button>
               </View>
             </View>
             <View style={styles.introSlide}>
@@ -53,9 +55,9 @@ export default class IntroScreen extends React.Component {
               <Text style={styles.introTitle}>Want to post free things?</Text>
               <Text style={styles.introText}>Do you have something you want to give for free or you just found something on nature strip? Post a thing here is super easy! Take a picture, adjust the position, and post!</Text>
               <View style={styles.skipContainer}>
-                <TouchableHighlight styleName="stacked clear" onPress={this.closeIntro}>
+                <Button transparent dark onPress={this.closeIntro}>
                   <Text>Skip Intro</Text>
-                </TouchableHighlight>
+                </Button>
               </View>
             </View>
         </SwiperFlatList>

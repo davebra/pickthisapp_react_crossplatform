@@ -41,6 +41,7 @@ HomeStack.navigationOptions = ({navigation})=>{
     tabBarIcon: ({ focused }) => (
       <TabBarIcon
         focused={focused}
+        type='Ionicons'
         name={
           Platform.OS === 'ios'
             ? `ios-pin`
@@ -80,6 +81,7 @@ AddAuthStack.navigationOptions = {
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
+      type='Ionicons'
       name={Platform.OS === 'ios' ? 'ios-camera' : 'md-camera'}
     />
   ),
@@ -109,6 +111,7 @@ MyAuthStack.navigationOptions = {
   ),  tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
+      type='Ionicons'
       name={Platform.OS === 'ios' ? 'ios-star' : 'md-star'}
     />
   ),

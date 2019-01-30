@@ -1,21 +1,14 @@
 import React from 'react';
-import { StyleSheet, AsyncStorage, View, TouchableHighlight, Text, TextInput } from 'react-native';
-import { 
-  ANDROID_AUTH_CLIENT_ID, 
-  IOS_AUTH_CLIENT_ID, 
-  ANDROID_STANDALONE_AUTH_CLIENT_ID, 
-  IOS_STANDALONE_AUTH_CLIENT_ID, 
-  FACEBOOK_APP_ID, 
-} from 'react-native-dotenv';
+import { StyleSheet, AsyncStorage, View, TextInput } from 'react-native';
+import { Icon, Button, Text } from 'native-base';
+import { GOOGLE_AUTH_WEB_CLIENT_ID, GOOGLE_AUTH_IOS_CLIENT_ID } from 'react-native-dotenv';
 import { loginUser, signupUser } from '../components/RestApi';
 import jwtDecode from 'jwt-decode';
 import { ScrollView } from 'react-native-gesture-handler';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Colors from '../constants/Colors';
-import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import Entypo from 'react-native-vector-icons/Entypo';
+import { LoginManager } from 'react-native-fbsdk';
+import { GoogleSignin, statusCodes } from 'react-native-google-signin';
 
 export default class LoginScreen extends React.Component {
   state = {
@@ -28,6 +21,14 @@ export default class LoginScreen extends React.Component {
 
   // execute immediatly after Login Screen is mounted
   componentDidMount() {
+
+    GoogleSignin.configure({
+      webClientId: GOOGLE_AUTH_WEB_CLIENT_ID,
+      offlineAccess: false,
+      forceConsentPrompt: false,
+      accountName: '', // [Android] specifies an account name on the device that should be used
+      iosClientId: GOOGLE_AUTH_IOS_CLIENT_ID,
+    });
 
     // check if is the user is already logged in
     AsyncStorage.getItem('userToken').then( value => {
@@ -57,14 +58,14 @@ export default class LoginScreen extends React.Component {
         {!this.state.userLogged ? (
           <View style={styles.loginContainer}>
             <Text style={styles.loginTitle}>Want to post something on PickThisApp?</Text>
-            <TouchableHighlight styleName="secondary" style={styles.googleLoginTouchable} onPress={this.googleAuth}>
-              <FontAwesome name="google-plus" style={styles.iconTouchableHighlight} />
+            <Button iconLeft style={styles.googleLoginTouchable} onPress={this.googleAuth}>
+              <Icon type='FontAwesome' name="google-plus" style={styles.iconTouchableHighlight} />
               <Text>JOIN WITH GOOGLE</Text>
-            </TouchableHighlight>
-            <TouchableHighlight styleName="secondary" style={styles.facebookLoginTouchableHighlight} onPress={this.facebookAuth}>
-              <FontAwesome name="facebook" style={styles.iconTouchableHighlight} />
+            </Button>
+            <Button iconLeft style={styles.facebookLoginTouchableHighlight} onPress={this.facebookAuth}>
+              <Icon type='FontAwesome' name="facebook" style={styles.iconTouchableHighlight} />
               <Text>JOIN WITH FACEBOOK</Text>
-            </TouchableHighlight>
+            </Button>
           </View>
         ) : (
           this.state.chooseNickname ? (
@@ -75,25 +76,22 @@ export default class LoginScreen extends React.Component {
                 onChangeText={(nickname) => this.setState({nickname})}
                 value={this.state.nickname}
               />
-              <TouchableHighlight 
-                styleName="secondary" 
-                style={styles.confirmNickname} 
-                onPress={this.checkSignupUser}>
-              <Entypo name="check" style={styles.iconTouchableHighlight} />
+              <Button iconLeft style={styles.confirmNickname} onPress={this.checkSignupUser}>
+              <Icon type='Entypo' name="check" style={styles.iconTouchableHighlight} />
               <Text>COMPLETE SIGNUP</Text>
-            </TouchableHighlight>
+            </Button>
             </View>
           ) : (
             <View style={styles.loginContainer}>
               <Text style={styles.loginTitle}>Hey {this.state.userData.nickname}!</Text>
-              <TouchableHighlight style={styles.logoutTouchable} onPress={this.executeLogout}>
-                <SimpleLineIcons name="logout" style={styles.logoutIconTouchableHighlight} />
+              <Button iconLeft style={styles.logoutTouchable} onPress={this.executeLogout}>
+                <Icon type='SimpleLineIcons' name="logout" style={styles.logoutIconTouchableHighlight} />
                 <Text>I WANT TO LOGOUT</Text>
-              </TouchableHighlight>
-              <TouchableHighlight styleName="secondary" onPress={()=>{this.props.navigation.goBack()}}>
-                <AntDesign name="back" style={styles.iconTouchableHighlight} />
+              </Button>
+              <Button iconLeft styleName="secondary" onPress={()=>{this.props.navigation.goBack()}}>
+                <Icon type='AntDesign' name="back" style={styles.iconTouchableHighlight} />
                 <Text>BACK TO YOUR THINGS</Text>
-              </TouchableHighlight>
+              </Button>
             </View>
           )
         )}
@@ -116,50 +114,55 @@ export default class LoginScreen extends React.Component {
 
   // function executed when the Google TouchableHighlight is clicked
   googleAuth = async () => {
+    this.setState({
+      errorMessage: '',
+      showErrorMessage: false
+    });
     try {
-      const result = await Google.logInAsync({
-        androidClientId: ANDROID_AUTH_CLIENT_ID,
-        androidStandaloneAppClientId: ANDROID_STANDALONE_AUTH_CLIENT_ID,
-        iosClientId: IOS_AUTH_CLIENT_ID,
-        iosStandaloneAppClientId: IOS_STANDALONE_AUTH_CLIENT_ID,
-        scopes: ['profile', 'email'],
-      });
-      if (result.type === 'success') {
-        this.checkLoginUser('google', result.user);
-      } else {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      console.log(userInfo);
+      //this.checkLoginUser('google', result.user);
+    } catch (error) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         console.log(`Google Login Canceled`);
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        this.setState({
+          errorMessage: 'Error during login, do you have the Google Play Services installed?',
+          showErrorMessage: true
+        });
+      } else {
+        this.setState({
+          errorMessage: 'Error during login, please try again or choose a different login method.',
+          showErrorMessage: true
+        });
       }
-    } catch(e) {
-      console.log(`Google Login Error: ${e}`);
-      this.setState({
-        errorMessage: 'Error during login, please try again or choose a different login method.',
-        showErrorMessage: true
-      });
     }
   }
 
   // function executed when the Facebook TouchableHighlight is clicked
-  facebookAuth = async () => {
-    try {
-      const { type, token } = await Facebook.logInWithReadPermissionsAsync(FACEBOOK_APP_ID, {
-        permissions: ['public_profile', 'email'],
-        behavior: 'web'
-      });
-      if (type === 'success') {
-        // Get the user's name using Facebook's Graph API
-        const userInfoResponse = await fetch(`https://graph.facebook.com/me?access_token=${token}`);
-        const userInfo = await userInfoResponse.json();
-        this.checkLoginUser('facebook', userInfo);
-      } else {
-        console.log(`Facebook Login Canceled`);
+  facebookAuth = () => {
+    this.setState({
+      errorMessage: '',
+      showErrorMessage: false
+    });
+    LoginManager.logInWithReadPermissions(['public_profile', 'email']).then(
+      function(result) {
+        if (result.isCancelled) {
+          console.log(`Facebook Login Canceled`);
+        } else {
+          console.log(result);
+          //this.checkLoginUser('facebook', userInfo);
+        }
+      },
+      function(error) {
+        console.log(`Facebook Login Error: ${error}`);
+        this.setState({
+          errorMessage: 'Error during login, please try again or choose a different login method.',
+          showErrorMessage: true
+        });
       }
-    } catch ({ message }) {
-      console.log(`Facebook Login Error: ${message}`);
-      this.setState({
-        errorMessage: 'Error during login, please try again or choose a different login method.',
-        showErrorMessage: true
-      });
-    }
+    );
   }
 
   checkLoginUser = (prov, userObj) => {

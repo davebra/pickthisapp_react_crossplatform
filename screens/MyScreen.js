@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, TouchableHighlight, AsyncStorage, Alert, Image, View, Text } from 'react-native';
+import { Icon, Button, Text } from 'native-base';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import jwtDecode from 'jwt-decode';
 import Colors from '../constants/Colors';
@@ -7,8 +8,6 @@ import { getUserThings, changeThingStatus } from '../components/RestApi';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { S3_BUCKET_URL } from 'react-native-dotenv';
 import Timestamp from 'react-timestamp';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 export default class MyScreen extends React.Component {
 
@@ -28,7 +27,8 @@ export default class MyScreen extends React.Component {
     headerRight: <TouchableHighlight title='user'
                   onPress={() => { navigation.navigate('Login') }}
                   >
-                    <FontAwesome 
+                    <Icon 
+                    type='FontAwesome' 
                     name={'user'} 
                     size={28} 
                     style={{
@@ -73,23 +73,21 @@ export default class MyScreen extends React.Component {
         }}
         renderItem={ (thing, ViewMap) => (
           <TouchableHighlight onPress={() =>{ this.goToThing(thing.item) }}>
-            <View>
-            <View style={{margin: 0}}>
-              <Image
-                styleName="small rounded-corners"
-                source={{uri: `${S3_BUCKET_URL}${thing.item.images[0]}`, cache: 'only-if-cached'}}
-              />
-            <View styleName="vertical stretch space-between">
-                <Text>Thing of <Timestamp time={thing.item.timestamp} format='full' component={Text} /></Text>
-                <Text>Status: 
-                    {{
-                        ['live']: ` Active`,
-                        ['paused']: ` Paused`,
-                    }[thing.item.status]}
-                </Text>
-            </View>
-            </View>
-            </View>
+              <View>
+                <Image
+                  styleName="small rounded-corners"
+                  source={{uri: `${S3_BUCKET_URL}${thing.item.images[0]}`, cache: 'only-if-cached'}}
+                />
+                <View styleName="vertical stretch space-between">
+                    <Text>Thing of <Timestamp time={thing.item.timestamp} format='full' component={Text} /></Text>
+                    <Text>Status: 
+                        {{
+                            ['live']: ` Active`,
+                            ['paused']: ` Paused`,
+                        }[thing.item.status]}
+                    </Text>
+                </View>
+              </View>
           </TouchableHighlight>
         )}
         renderHiddenItem={ (thing, ViewMap) => (
@@ -102,8 +100,8 @@ export default class MyScreen extends React.Component {
               }}
               style={styles.TouchableHighlightPlayPause}>
                   {{
-                      ['live']: <MaterialCommunityIcons name="pause" size={20} />,
-                      ['paused']: <MaterialCommunityIcons name="play" size={20} />,
+                      ['live']: <Icon type='MaterialCommunityIcons' name="pause" size={20} />,
+                      ['paused']: <Icon type='MaterialCommunityIcons' name="play" size={20} />,
                   }[thing.item.status]}
                   {{
                       ['live']: <Text>Pause</Text>,
@@ -117,7 +115,7 @@ export default class MyScreen extends React.Component {
                   ViewMap[thing.index].manuallySwipeView(0);
                   this.clickDeleteThing( thing.item._id )
                 }}>
-                <FontAwesome name="trash-o" style={{color: Colors.lightColor}} size={20} />
+                <Icon type='FontAwesome' name="trash-o" style={{color: Colors.lightColor}} size={20} />
                 <Text style={{color: Colors.lightColor}}>Delete</Text>
               </TouchableHighlight>
             </View>

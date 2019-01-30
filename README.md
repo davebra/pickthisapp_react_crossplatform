@@ -4,14 +4,22 @@ PickThisApp React Native, Final Assignment project for the Cross Platform subjec
 
 ### Requirements
 
-* Node.js 6 or greater
+* Node.js 8 or greater
+* react-native-cli
+
+### Installation
+
+* Clone the project
+* enter the folder and install dependencies `npm install`
+* link react native dependencies `react-native link`
+* start the project with `react-native run-ios` or `react-native run-android`
 
 ### Extensions, Libraries and Components
 
-* React Native
-* Expo
+* react-native
+* native-base (ui theme)
+* react-native-vector-icons (icons)
 * react-native-dotenv (environment management)
-* Shoutem UI toolkit (ui/theme/animation)
 * react-navigation (default top and bottom tab navigations)
 * react-native-maps (map for Home and Add screens)
 * react-navigation-popover (to enable popovers in navigation for Home screen)
@@ -23,8 +31,10 @@ PickThisApp React Native, Final Assignment project for the Cross Platform subjec
 * react-native-actionsheet (actionsheet cross platform)
 * react-native-loading-spinner-overlay (loading overlay)
 * react-timestamp (format date time)
+* react-native-fbsdk (library for allow the FB login)
+* react-native-image-picker (library for allow the Google login)
 
 #### Extra Infos
 
-* node_modules/@shoutem/ui/index.js comment lines 44,45,65 https://github.com/shoutem/ui/issues/411#issuecomment-455069635
-
+* Project started with Expo, but ejected cause some native module was necessaries in order to continue the project (e.g. react-native-image-picker)
+* React Native has been reinstalled (from the latest version) cause wrong dependencies links after ejecting Expo

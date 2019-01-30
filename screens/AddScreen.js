@@ -1,12 +1,12 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, ScrollView, AsyncStorage, Dimensions, TouchableHighlight, Title, Text, TextInput } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, ScrollView, AsyncStorage, Dimensions, TextInput } from 'react-native';
+import { Button, Text, Icon } from 'native-base';
 import ImagePicker from 'react-native-image-picker';
 import MapView from 'react-native-maps';
 import jwtDecode from 'jwt-decode';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Colors from '../constants/Colors';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import EvilIcons from 'react-native-vector-icons/EvilIcons';
 
 export default class AddScreen extends React.Component {
 
@@ -69,7 +69,7 @@ export default class AddScreen extends React.Component {
           <TouchableOpacity 
             style={(this.state.pictures < 5) ? styles.pictureNewCell : { display: 'none' }} 
             onPress={this.TouchableHighlightTakePicture}>
-              <EvilIcons name="camera" size={96} style={{color: Colors.primaryColor}} />
+              <Icon type='EvilIcons' name="camera" size={96} style={{color: Colors.primaryColor}} />
           </TouchableOpacity>
 
         </View>

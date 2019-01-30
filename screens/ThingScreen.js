@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, ScrollView, Dimensions, Image, AsyncStorage, Alert, TouchableHighlight, Title, Text, View } from 'react-native';
+import { StyleSheet, ScrollView, Dimensions, Image, AsyncStorage, Alert, View } from 'react-native';
+import { Button, Text } from 'native-base';
 import SwiperFlatList from 'react-native-swiper-flatlist';
 import { S3_BUCKET_URL } from 'react-native-dotenv';
 import { TagText } from '../components/TagText';
@@ -55,22 +56,21 @@ export default class ThingScreen extends React.Component {
             ['low']: ` Something's left`,
             ['empty']: ` Everything's gone`,
         }[this.state.thing.availability]}</Title>
-      <TouchableHighlight 
-        styleName="secondary" 
+      <Button 
         onPress={() => { this.driveMeHere(this.state.thing.location.coordinates[1], this.state.thing.location.coordinates[0]) }} 
         style={styles.oneTouchableHighlight}
         >
         <MaterialCommunityIcons name="car-pickup" style={styles.iconTouchableHighlight} />
         <Text>PICK THIS THING UP</Text>
-      </TouchableHighlight>
-      <TouchableHighlight 
+      </Button>
+      <Button 
         styleName="secondary" 
         onPress={this.showAvailabilityActionSheet} 
         style={styles.oneTouchableHighlight}
         >
         <Entypo name="select-arrows" style={styles.iconTouchableHighlight} />
         <Text>UPDATE AVAILABILITY</Text>
-      </TouchableHighlight>
+      </Button>
       <ActionSheet
           ref={o => this.AvailabilityActionSheet = o}
           title={'What is the availability of this thing?'}
@@ -78,14 +78,14 @@ export default class ThingScreen extends React.Component {
           cancelTouchableHighlightIndex={4}
           onPress={(index) => { this.updateAvailability(index) }}
         />
-      <TouchableHighlight 
+      <Button 
         styleName="secondary" 
         onPress={this.showInappropriateActionSheet} 
         style={styles.TouchableHighlightReport}
         >
         <MaterialIcons name="report" style={styles.iconTouchableHighlight} />
         <Text>REPORT INAPPROPRIATE</Text>
-      </TouchableHighlight>
+      </Button>
       <ActionSheet
           ref={o => this.InappropriateActionSheet = o}
           title={'What do you want to report?'}

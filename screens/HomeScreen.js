@@ -1,10 +1,10 @@
 import React from 'react';
-import { TouchableOpacity, Picker, AsyncStorage, TouchableHighlight, Image, Text, View } from 'react-native';
+import { TouchableOpacity, Picker, TouchableHighlight, AsyncStorage, Image, View } from 'react-native';
+import { Container, Text, Icon } from 'native-base';
 import MapView, { Marker } from 'react-native-maps';
 import Popover from 'react-native-popover-view';
 import SwiperFlatList from 'react-native-swiper-flatlist';
 import { S3_BUCKET_URL } from 'react-native-dotenv';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { TagText } from '../components/TagText';
 import styles from './HomeScreen.styles.js';
@@ -31,7 +31,7 @@ export default class HomeScreen extends React.Component {
     this.downloadedThings = [];
   }
 
-  // set the header navigator options, with the filter TouchableHighlight
+  // set the header navigator options, with the filter
   static navigationOptions = ({ navigation }) => {
     const { params = {} } = navigation.state;
     return {
@@ -42,7 +42,8 @@ export default class HomeScreen extends React.Component {
         </View>
       ),
       headerRight: <TouchableHighlight onPress={params.openFilters} title='filter'>
-                    <MaterialCommunityIcons 
+                    <Icon 
+                    type='MaterialCommunityIcons' 
                     name={'filter'} 
                     size={28} 
                     style={styles.iconFilter} />
