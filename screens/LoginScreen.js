@@ -1,12 +1,13 @@
 import React from 'react';
 import { StyleSheet, AsyncStorage, View, TextInput, ScrollView } from 'react-native';
-import { Icon, Button, Text, H2 } from 'native-base';
+import { Icon, Button, Text, H2, Item, Label, Input } from 'native-base';
 import { loginUser, signupUser } from '../components/RestApi';
 import jwtDecode from 'jwt-decode';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Colors from '../constants/Colors';
+import { GOOGLE_AUTH_WEB_CLIENT_ID, GOOGLE_AUTH_IOS_CLIENT_ID } from 'react-native-dotenv';
 //import { LoginManager } from 'react-native-fbsdk';
-//import { GoogleSignin, statusCodes } from 'react-native-google-signin';
+import { GoogleSignin, statusCodes } from 'react-native-google-signin';
 
 export default class LoginScreen extends React.Component {
   state = {
@@ -20,13 +21,13 @@ export default class LoginScreen extends React.Component {
   // execute immediatly after Login Screen is mounted
   componentDidMount() {
 
-    // GoogleSignin.configure({
-    //   webClientId: GOOGLE_AUTH_WEB_CLIENT_ID,
-    //   offlineAccess: false,
-    //   forceConsentPrompt: false,
-    //   accountName: '', // [Android] specifies an account name on the device that should be used
-    //   iosClientId: GOOGLE_AUTH_IOS_CLIENT_ID,
-    // });
+    GoogleSignin.configure({
+      webClientId: GOOGLE_AUTH_WEB_CLIENT_ID,
+      offlineAccess: false,
+      forceConsentPrompt: false,
+      accountName: '', // [Android] specifies an account name on the device that should be used
+      iosClientId: GOOGLE_AUTH_IOS_CLIENT_ID,
+    });
 
     // check if is the user is already logged in
     AsyncStorage.getItem('userToken').then( value => {
@@ -69,11 +70,13 @@ export default class LoginScreen extends React.Component {
           this.state.chooseNickname ? (
             <View style={styles.loginContainer}>
               <Text style={styles.loginTitle}>Choose a nickname</Text>
-              <TextInput
-                placeholder={'Nickname'}
-                onChangeText={(nickname) => this.setState({nickname})}
-                value={this.state.nickname}
-              />
+              <Item floatingLabel>
+                <Label>Nickname</Label>
+                <Input
+                  onChangeText={(nickname) => this.setState({nickname})}
+                  value={this.state.nickname}
+                  />
+              </Item>
               <Button iconLeft block style={[styles.colorButton, styles.confirmNickname]} onPress={this.checkSignupUser}>
               <Icon type='Entypo' name="check" style={styles.iconTouchableHighlight} />
               <Text>COMPLETE SIGNUP</Text>
@@ -119,8 +122,7 @@ export default class LoginScreen extends React.Component {
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
-      console.log(userInfo);
-      //this.checkLoginUser('google', result.user);
+      this.checkLoginUser('google', userInfo.user);
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         console.log(`Google Login Canceled`);

@@ -59,7 +59,7 @@ export default class ThingScreen extends React.Component {
         style={styles.oneButton}
         >
         <Icon type='MaterialCommunityIcons' name="car-pickup" style={styles.iconButton} />
-        <Text>PICK THIS THING UP</Text>
+        <Text style={styles.buttonText}>PICK THIS THING UP</Text>
       </Button>
       <Button 
         iconLeft block 
@@ -67,7 +67,7 @@ export default class ThingScreen extends React.Component {
         style={styles.oneButton}
         >
         <Icon type='Entypo' name="select-arrows" style={styles.iconButton} />
-        <Text>UPDATE AVAILABILITY</Text>
+        <Text style={styles.buttonText}>UPDATE AVAILABILITY</Text>
       </Button>
       <ActionSheet
           ref={o => this.AvailabilityActionSheet = o}
@@ -82,7 +82,7 @@ export default class ThingScreen extends React.Component {
         style={styles.buttonReport}
         >
         <Icon type='MaterialIcons' name="report" style={styles.iconButton} />
-        <Text>REPORT INAPPROPRIATE</Text>
+        <Text style={styles.buttonText}>REPORT INAPPROPRIATE</Text>
       </Button>
       <ActionSheet
           ref={o => this.InappropriateActionSheet = o}
@@ -227,7 +227,9 @@ const styles = StyleSheet.create({
     height: 52,
     backgroundColor: Colors.dangerColor,
     borderColor: Colors.noticeText,
-    color: '#fff'
+  },
+  buttonText: {
+    color: '#fff',
   },
   iconButton: {
     fontSize: 22,

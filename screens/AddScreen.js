@@ -1,12 +1,12 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, ScrollView, AsyncStorage, Dimensions, TextInput } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, ScrollView, AsyncStorage, Dimensions, Image } from 'react-native';
 import { Button, Text, Icon } from 'native-base';
 import ImagePicker from 'react-native-image-picker';
 import MapView from 'react-native-maps';
 import jwtDecode from 'jwt-decode';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Colors from '../constants/Colors';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Autocomplete from '../components/Autocomplete';
 
 export default class AddScreen extends React.Component {
 
@@ -16,6 +16,8 @@ export default class AddScreen extends React.Component {
       userData: {},
       spinner: false,
       pictures: [],
+      tagsAutocomplete: [{name: 'Test'}, {name: 'Another'}],
+      tags: []
     };
 
     this.thingPosition = {
@@ -57,19 +59,25 @@ export default class AddScreen extends React.Component {
 
         <View style={styles.pictures}>
 
-          {this.state.pictures.map( (marker, i) => (
-            <View style={styles.pictureCell}>
+          {this.state.pictures.map( (image, i) => (
+            <View key={i} style={styles.pictureCell}>
               <Image 
                 style={styles.pictureCellImage} 
                 resizeMode='cover'
-                source={require('../assets/images/intro3.png')} />
-          </View>
+                source={{ uri: image }} />
+              <Button
+                transparent small iconRight
+                style={styles.pictureCellImageRemove}
+                onPress={() => { this.removePicture(i) }}>
+                <Icon type='MaterialIcons' name="remove-circle" size={32} style={{color: Colors.dangerColor}} />
+              </Button>
+            </View>
           ))}
 
-          <TouchableOpacity 
-            style={(this.state.pictures < 5) ? styles.pictureNewCell : { display: 'none' }} 
-            onPress={this.TouchableHighlightTakePicture}>
-              <Icon type='EvilIcons' name="camera" size={96} style={{color: Colors.primaryColor}} />
+          <TouchableOpacity onPress={this.takePicture}>
+            <View style={(this.state.pictures.length < 5) ? styles.pictureNewCell : { display: 'none' }}>
+              <Icon type='EvilIcons' name="camera" size={128} style={{color: Colors.primaryColor}} />
+            </View>
           </TouchableOpacity>
 
         </View>
@@ -88,10 +96,21 @@ export default class AddScreen extends React.Component {
           loadingBackgroundColor="#eeeeee"
           showsUserLocation={false}
           showsPointsOfInterest={false}
-          onRegionChangeComplete={this.onRegionChangeComplete}
-          >
-            <MaterialCommunityIcons name="map-marker-outline" size={42} style={{color: Colors.darkColor, marginTop: -21}} />
+          onRegionChangeComplete={this.onRegionChangeComplete}>
+            <Icon type='FontAwesome' name="map-pin" size={42} style={{color: Colors.darkColor, marginTop: -21}} />
           </MapView>
+
+          <Autocomplete
+            autoCapitalize="none"
+            autoCorrect={false}
+            data={this.state.tagsAutocomplete}
+            onChangeText={text => { console.log(text); }}
+            renderItem={(name) => (
+              <TouchableOpacity onPress={() => { console.log(name); }}>
+                <Text>asd</Text>
+              </TouchableOpacity>
+            )}
+          />
 
       </ScrollView>
     );
@@ -118,33 +137,53 @@ export default class AddScreen extends React.Component {
     this.thingPosition.longitude =  region.longitude;
   }
 
-  TouchableHighlightTakePicture = () => {
-    // const options = {
-    //   title: 'Take or select Picture'
-    // };
-    // ImagePicker.showImagePicker(options, (response) => {
-    //   if (response.didCancel) {}
-    //   else if (response.error) {}
-    //   else if (response.customTouchableHighlight) {}
-    //   else {
-    //     this.props.addPhoto({
-    //       fileName: response.fileName,
-    //       path: response.path,
-    //       type: response.type,
-    //       uri: response.uri,
-    //       width: response.width,
-    //       height: response.height,
-    //     });
-    //   }
-    // });
+  takePicture = () => {
+    const options = {
+      title: 'Select a Picture',
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+      },
+    };
+    ImagePicker.showImagePicker(options, (response) => {
+      if (response.didCancel) {}
+      else if (response.error) {}
+      else {
+        this.setState(prevState => ({
+          pictures: [...prevState.pictures, response.uri]
+        }));
+        // response.fileName
+        // response.path
+        // response.type
+        // response.uri
+        // response.width
+        // response.height
+      }
+    });
   }
 
-  // function to open the single Ting screen passing the object content
+  removePicture = (i) => {
+    let newPictures = [...this.state.pictures];
+    newPictures.splice(i, 1);
+    this.setState({pictures: newPictures});
+  }
+
+  // function to open the single Thing screen passing the object content
   thingPublished = () => {
     this.props.navigation.navigate('Published',{
         nickname: this.state.userData.nickname
     });
   };
+
+  tagDelete = index => {
+    let tagsSelected = this.state.tags;
+    tagsSelected.splice(index, 1);
+    this.setState({ tags });
+ }
+ 
+  tagAdd = suggestion => {
+    this.setState({ tags: this.state.tagsSelected.concat([suggestion]) });
+  }
 
 }
 
@@ -196,7 +235,12 @@ const styles = StyleSheet.create({
   pictureCellImage: {
     width: width / 2 - 24,
     height: width / 2 - 36,
-
+    borderRadius: 4,
+  },
+  pictureCellImageRemove: {
+    position: 'absolute',
+    top: -10,
+    right: -20,
   },
   addmap: {
     marginTop: 20,
@@ -205,6 +249,5 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-  }
-  
+  },
 });
