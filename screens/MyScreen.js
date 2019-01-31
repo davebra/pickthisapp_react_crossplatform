@@ -147,35 +147,35 @@ export default class MyScreen extends React.Component {
     });
   }
 
-    // delete is clicked, update the status on the RestAPI
-    clickDeleteThing = (thingid) => {
-      changeThingStatus(thingid, 'deleted').then(res => {
-        this.showAlert('Thing Deleted', 'Your thing has been succesfully deleted.');
-        this.setState({spinner: true});
-        this.loadMyThings();
-      });
-    }
-  
-    // pause/resume is clicked, update the status on the RestAPI
-    clickPauseThing = (thingid, status) => {
-      var statusText = (status === 'live') ? 'resumed' : 'paused';
-      changeThingStatus(thingid, status).then(res => {
-        this.showAlert( `Thing ${statusText}`, `Your thing has been succesfully ${statusText}.`);
-        this.setState({spinner: true});
-        this.loadMyThings();
-      });
-    }
+  // delete is clicked, update the status on the RestAPI
+  clickDeleteThing = (thingid) => {
+    changeThingStatus(thingid, 'deleted').then(res => {
+      this.showAlert('Thing Deleted', 'Your thing has been succesfully deleted.');
+      this.setState({spinner: true});
+      this.loadMyThings();
+    });
+  }
 
-    showAlert = (title, text) => {
-      Alert.alert(
-        title,
-        text,
-        [
-          {text: 'OK', onPress: () => console.log('OK Pressed')},
-        ],
-        {cancelable: false},
-      );
-    }
+  // pause/resume is clicked, update the status on the RestAPI
+  clickPauseThing = (thingid, status) => {
+    var statusText = (status === 'live') ? 'resumed' : 'paused';
+    changeThingStatus(thingid, status).then(res => {
+      this.showAlert( `Thing ${statusText}`, `Your thing has been succesfully ${statusText}.`);
+      this.setState({spinner: true});
+      this.loadMyThings();
+    });
+  }
+
+  showAlert = (title, text) => {
+    Alert.alert(
+      title,
+      text,
+      [
+        {text: 'OK', onPress: () => console.log('OK Pressed')},
+      ],
+      {cancelable: false},
+    );
+  }
 
 }
 

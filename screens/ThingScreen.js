@@ -32,12 +32,10 @@ export default class ThingScreen extends React.Component {
       paginationStyle={styles.swiperPagination}>
       {this.state.thing.images.map( (image, i) => (
         <View key={i} style={{ width, height: height * 0.5 }}>
-          {/* <Lightbox renderContent={() => { return this.renderLightboxImage(image); }}> */}
             <Image
               style={{ height: width, height: height * 0.5 }}
               source={{uri: `${S3_BUCKET_URL}${image}`}}
             />
-          {/* </Lightbox> */}
         </View>
       ))}
       </SwiperFlatList>
@@ -94,16 +92,6 @@ export default class ThingScreen extends React.Component {
       </ScrollView>
     );
   }
-
-  renderLightboxImage = (image) => (
-    <View style={styles.lightboxView}>
-      <Image
-        style={styles.lightboxImage}
-        resizeMode="contain"
-        source={{ uri: `${S3_BUCKET_URL}${image}`, cache: 'only-if-cached' }}
-      />
-    </View>
-  )
 
   driveMeHere = (latitude, longitude) => {
     showLocation({

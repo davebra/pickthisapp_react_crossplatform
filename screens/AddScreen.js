@@ -7,6 +7,8 @@ import jwtDecode from 'jwt-decode';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Colors from '../constants/Colors';
 import Autocomplete from '../components/Autocomplete';
+import { getTags, uploadImage, addThings } from '../components/RestApi';
+import { TagText } from '../components/TagText';
 
 export default class AddScreen extends React.Component {
 
@@ -16,7 +18,8 @@ export default class AddScreen extends React.Component {
       userData: {},
       spinner: false,
       pictures: [],
-      tagsAutocomplete: [{name: 'Test'}, {name: 'Another'}],
+      tagsAutocomplete: [],
+      tagsAutocompleteAdd: [],
       tags: []
     };
 
@@ -65,12 +68,11 @@ export default class AddScreen extends React.Component {
                 style={styles.pictureCellImage} 
                 resizeMode='cover'
                 source={{ uri: image }} />
-              <Button
-                transparent small iconRight
+              <TouchableOpacity
                 style={styles.pictureCellImageRemove}
                 onPress={() => { this.removePicture(i) }}>
                 <Icon type='MaterialIcons' name="remove-circle" size={32} style={{color: Colors.dangerColor}} />
-              </Button>
+              </TouchableOpacity>
             </View>
           ))}
 
@@ -100,20 +102,71 @@ export default class AddScreen extends React.Component {
             <Icon type='FontAwesome' name="map-pin" size={42} style={{color: Colors.darkColor, marginTop: -21}} />
           </MapView>
 
-          <Autocomplete
-            autoCapitalize="none"
-            autoCorrect={false}
-            data={this.state.tagsAutocomplete}
-            onChangeText={text => { console.log(text); }}
-            renderItem={(name) => (
-              <TouchableOpacity onPress={() => { console.log(name); }}>
-                <Text>asd</Text>
-              </TouchableOpacity>
-            )}
-          />
+          <View style={styles.tagsContainer}>
+          {this.state.tags.map( (tag, j) => (
+            <TagText key={j} style={{fontSize: 18}}>{tag}</TagText>
+          ))}
+          </View>
+
+          <View style={styles.tagsFinder}>
+            <Autocomplete
+              autoCapitalize="none"
+              autoCorrect={false}
+              data={this.state.tagsAutocomplete}
+              onChangeText={text => { this.searchTags(text) }}
+              renderItem={(item) => (
+                <TouchableOpacity 
+                  key={item.index} 
+                  style={styles.tagsFinderItem}
+                  onPress={() => { this.addTag(item.item.name) }}>
+                  <Text>{item.item.name}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
 
       </ScrollView>
     );
+  }
+
+  searchTags = (text) => {
+    if(text.length > 1){
+      getTags(text).then(res => { 
+        if( Array.isArray(res) ){
+          if( res.length > 0 ){
+            this.setState({tagsAutocomplete: res});
+          } else {
+            this.setState({tagsAutocomplete: [{name: `Add ${text}...`}]});
+          }
+        }
+      }).catch(err => { 
+        console.log(err) 
+      });
+    } else {
+      this.setState({tagsAutocomplete: []});
+    }
+  }
+
+  addTag = (tag) => {
+    let addTheTag;
+    if(tag.indexOf("Add") > -1 && tag.indexOf("...") > -1){
+      addTheTag = tag.substr(4, tag.length - 7);
+    } else {
+      addTheTag = tag;
+    }
+    
+    if(this.state.tags.indexOf(addTheTag) < 0){
+      this.setState(prevState => ({
+        tags: [...prevState.tags, addTheTag]
+      }));
+    }
+
+  }
+
+  removeTag = (tag) => {
+    let tagsSelected = this.state.tags;
+    tagsSelected.splice(index, 1);
+    this.setState({ tags });
   }
 
   // function executed when the location of the user has been found by MapView
@@ -175,16 +228,6 @@ export default class AddScreen extends React.Component {
     });
   };
 
-  tagDelete = index => {
-    let tagsSelected = this.state.tags;
-    tagsSelected.splice(index, 1);
-    this.setState({ tags });
- }
- 
-  tagAdd = suggestion => {
-    this.setState({ tags: this.state.tagsSelected.concat([suggestion]) });
-  }
-
 }
 
 export const { width, height } = Dimensions.get('window');
@@ -240,7 +283,8 @@ const styles = StyleSheet.create({
   pictureCellImageRemove: {
     position: 'absolute',
     top: -10,
-    right: -20,
+    right: -10,
+    zIndex: 10,
   },
   addmap: {
     marginTop: 20,
@@ -249,5 +293,20 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    padding: 16,
+  },
+  tagsFinder: {
+    paddingLeft: 16,
+    paddingRight: 16,
+  },
+  tagsFinderItem: {
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingTop: 5,
+    paddingBottom: 5,
   },
 });

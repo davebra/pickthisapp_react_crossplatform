@@ -180,3 +180,21 @@ export async function addThings(type, lat, lng, tags, images) {
     });
 }
 
+export async function getTags(text) {
+    console.log(text);
+    return new Promise((resolve, reject) => {
+        fetch(`${RESTAPI_URL}/tags?s=${text}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        })
+        .then((resp) => {
+            return resp.json();
+        })
+        .then((resp) => {
+            resolve(resp);
+        });
+    });
+}

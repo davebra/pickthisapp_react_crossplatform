@@ -5,73 +5,31 @@ import {
   ScrollView,
   Platform,
   StyleSheet,
-  Text,
   TextInput,
   View,
   ViewPropTypes as RNViewPropTypes
 } from 'react-native';
+import { Text, Item, Label, Input } from 'native-base';
+import Colors from '../constants/Colors';
 
 const ViewPropTypes = RNViewPropTypes || View.propTypes;
 
 class Autocomplete extends Component {
   static propTypes = {
     ...TextInput.propTypes,
-    /**
-     * These styles will be applied to the container which
-     * surrounds the autocomplete component.
-     */
     containerStyle: ViewPropTypes.style,
-    /**
-     * Assign an array of data objects which should be
-     * rendered in respect to the entered text.
-     */
     data: PropTypes.array,
-    /**
-     * Set to `true` to hide the suggestion list.
-     */
     hideResults: PropTypes.bool,
-    /*
-     * These styles will be applied to the container which surrounds
-     * the textInput component.
-     */
     inputContainerStyle: ViewPropTypes.style,
-    /*
-     * Set `keyboardShouldPersistTaps` to true if RN version is <= 0.39.
-     */
     keyboardShouldPersistTaps: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.bool
     ]),
-    /*
-     * These styles will be applied to the container which surrounds
-     * the result list.
-     */
     listContainerStyle: ViewPropTypes.style,
-    /**
-     * `onShowResults` will be called when list is going to
-     * show/hide results.
-     */
     onShowResults: PropTypes.func,
-    /**
-     * method for intercepting swipe on ListView. Used for ScrollView support on Android
-     */
     onStartShouldSetResponderCapture: PropTypes.func,
-    /**
-     * `renderItem` will be called to render the data objects
-     * which will be displayed in the result view below the
-     * text input.
-     */
     renderItem: PropTypes.func,
-    keyExtractor: PropTypes.func.isRequired,
-    /**
-     * `renderSeparator` will be called to render the list separators
-     * which will be displayed between the list elements in the result view
-     * below the text input.
-     */
     renderSeparator: PropTypes.func,
-    /**
-     * renders custom TextInput. All props passed to this function.
-     */
     renderTextInput: PropTypes.func,
     flatListProps: PropTypes.object,
   };
@@ -83,7 +41,12 @@ class Autocomplete extends Component {
     onStartShouldSetResponderCapture: () => false,
     renderItem: ({ item }) => <Text>{item}</Text>,
     renderSeparator: null,
-    renderTextInput: props => <TextInput {...props} />,
+    renderTextInput: props => (
+      <Item floatingLabel>
+        <Label>Type a tag...</Label>
+        <Input {...props} />
+      </Item>
+      ),
     flatListProps: {},
   };
 
@@ -127,7 +90,6 @@ class Autocomplete extends Component {
     const { data } = this.state;
     const {
       renderItem,
-      keyExtractor,
       renderSeparator,
       keyboardShouldPersistTaps,
       flatListProps
@@ -139,7 +101,7 @@ class Autocomplete extends Component {
         data={data}
         keyboardShouldPersistTaps={keyboardShouldPersistTaps}
         renderItem={renderItem}
-        keyExtractor={keyExtractor}
+        keyExtractor={(item, index) => item.id}
         renderSeparator={renderSeparator}
         style={styles.list}
         {...flatListProps}
@@ -196,26 +158,16 @@ class Autocomplete extends Component {
   }
 }
 
-const border = {
-  borderColor: '#b9b9b9',
-  borderRadius: 1,
-  borderWidth: 1
-};
-
 const androidStyles = {
   container: {
     flex: 1
   },
   inputContainer: {
-    ...border,
     marginBottom: 0
   },
   list: {
-    ...border,
-    backgroundColor: 'white',
-    borderTopWidth: 0,
-    margin: 10,
-    marginTop: 0
+    backgroundColor: Colors.lightColor,
+    margin: 0,
   }
 };
 
@@ -224,17 +176,10 @@ const iosStyles = {
     zIndex: 1
   },
   inputContainer: {
-    ...border
-  },
-  input: {
-    backgroundColor: 'white',
-    height: 40,
-    paddingLeft: 3
+    marginBottom: 0
   },
   list: {
-    ...border,
-    backgroundColor: 'white',
-    borderTopWidth: 0,
+    backgroundColor: Colors.lightColor,
     left: 0,
     position: 'absolute',
     right: 0
@@ -242,11 +187,6 @@ const iosStyles = {
 };
 
 const styles = StyleSheet.create({
-  input: {
-    backgroundColor: 'white',
-    height: 40,
-    paddingLeft: 3
-  },
   ...Platform.select({
     android: { ...androidStyles },
     ios: { ...iosStyles }
