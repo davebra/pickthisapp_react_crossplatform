@@ -101,8 +101,8 @@ class Autocomplete extends Component {
         data={data}
         keyboardShouldPersistTaps={keyboardShouldPersistTaps}
         renderItem={renderItem}
-        keyExtractor={(item, index) => item.id}
-        renderSeparator={renderSeparator}
+        keyExtractor={(item, index) => index.toString()}
+        //renderSeparator={renderSeparator}
         style={styles.list}
         {...flatListProps}
       />

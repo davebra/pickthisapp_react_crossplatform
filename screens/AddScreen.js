@@ -114,14 +114,14 @@ export default class AddScreen extends React.Component {
               autoCorrect={false}
               data={this.state.tagsAutocomplete}
               onChangeText={text => { this.searchTags(text) }}
-              renderItem={(item) => (
+              renderItem={(suggestion) => 
                 <TouchableOpacity 
-                  key={item.index} 
+                  key={suggestion.index.toString()} 
                   style={styles.tagsFinderItem}
-                  onPress={() => { this.addTag(item.item.name) }}>
-                  <Text>{item.item.name}</Text>
+                  onPress={() => { this.addTag(suggestion.item.name) }}>
+                  <Text>{suggestion.item.name}</Text>
                 </TouchableOpacity>
-              )}
+              }
             />
           </View>
 
