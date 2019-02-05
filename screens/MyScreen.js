@@ -1,6 +1,6 @@
 import React from 'react';
-import { StyleSheet, TouchableHighlight, AsyncStorage, Alert, Image, View } from 'react-native';
-import { Icon, Button, Text } from 'native-base';
+import { StyleSheet, TouchableHighlight, AsyncStorage, Alert, View } from 'react-native';
+import { Icon, Button, Text, ListItem, Left, Thumbnail, Body, Right } from 'native-base';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import jwtDecode from 'jwt-decode';
 import Colors from '../constants/Colors';
@@ -72,52 +72,51 @@ export default class MyScreen extends React.Component {
           return index.toString();
         }}
         renderItem={ (thing, ViewMap) => (
-          <TouchableHighlight onPress={() =>{ this.goToThing(thing.item) }}>
-              <View>
-                <Image
-                  styleName="small rounded-corners"
-                  source={{uri: `${S3_BUCKET_URL}${thing.item.images[0]}`, cache: 'only-if-cached'}}
-                />
-                <View styleName="vertical stretch space-between">
-                    <Text>Thing of <Timestamp time={thing.item.timestamp} format='full' component={Text} /></Text>
-                    <Text>Status: 
-                        {{
-                            ['live']: ` Active`,
-                            ['paused']: ` Paused`,
-                        }[thing.item.status]}
-                    </Text>
-                </View>
-              </View>
-          </TouchableHighlight>
+          <ListItem thumbnail style={styles.listItem}>
+              <Left>
+                <Thumbnail square source={{uri: `${S3_BUCKET_URL}${thing.item.images[0]}`, cache: 'only-if-cached'}} />
+              </Left>
+              <Body>
+                <Text>Thing of <Timestamp time={thing.item.timestamp} format='full' component={Text} /></Text>
+                <Text note numberOfLines={1}>Status: 
+                  {{
+                    ['live']: ` Active`,
+                    ['paused']: ` Paused`,
+                  }[thing.item.status]}
+                </Text>
+              </Body>
+              <Right>
+                <Button transparent onPress={() =>{ this.goToThing(thing.item) }}>
+                  <Text>View</Text>
+                </Button>
+              </Right>
+            </ListItem>
         )}
         renderHiddenItem={ (thing, ViewMap) => (
-            <View style={styles.ViewBack}>
-              <TouchableHighlight 
-              styleName="stacked clear" 
-              onPress={ () => {
-                ViewMap[thing.index].manuallySwipeView(0);
-                this.clickPauseThing( thing.item._id, (thing.item.status === 'live' ) ? 'paused' : 'live' )
-              }}
-              style={styles.TouchableHighlightPlayPause}>
-                  {{
-                      ['live']: <Icon type='MaterialCommunityIcons' name="pause" size={20} />,
-                      ['paused']: <Icon type='MaterialCommunityIcons' name="play" size={20} />,
-                  }[thing.item.status]}
-                  {{
-                      ['live']: <Text>Pause</Text>,
-                      ['paused']: <Text>Resume</Text>,
-                  }[thing.item.status]}
-              </TouchableHighlight>
-              <TouchableHighlight 
-                styleName="stacked clear"  
-                style={styles.TouchableHighlightDelete}
+            <View style={styles.listItemBack}>
+              <View style={styles.backPlayPause}>
+                <Button 
+                transparent dark iconLeft large
                 onPress={ () => {
                   ViewMap[thing.index].manuallySwipeView(0);
-                  this.clickDeleteThing( thing.item._id )
+                  this.clickPauseThing( thing.item._id, (thing.item.status === 'live' ) ? 'paused' : 'live' )
                 }}>
-                <Icon type='FontAwesome' name="trash-o" style={{color: Colors.lightColor}} size={20} />
-                <Text style={{color: Colors.lightColor}}>Delete</Text>
-              </TouchableHighlight>
+                    {{
+                        ['live']: <Icon type='MaterialCommunityIcons' name="pause" size={20} />,
+                        ['paused']: <Icon type='MaterialCommunityIcons' name="play" size={20} />,
+                    }[thing.item.status]}
+                </Button>
+              </View>
+              <View style={styles.backDelete}>
+                <Button 
+                  transparent iconLeft large
+                  onPress={ () => {
+                    ViewMap[thing.index].manuallySwipeView(0);
+                    this.clickDeleteThing( thing.item._id )
+                  }}>
+                  <Icon type='FontAwesome' name="trash-o" style={{color: Colors.lightColor}} size={20} />
+                </Button>
+              </View>
             </View>
         )}
         disableRightSwipe={true}
@@ -184,21 +183,37 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  ViewBack: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end'
+  listItem: {
+    backgroundColor: '#fff',
+  },
+  listItemBack: {
+    flex: 1,
   },
   iconFilter: {
     marginTop: 1,
     marginRight: 5,
     color: Colors.primaryColor
   },
-  TouchableHighlightPlayPause:{
+  backPlayPause:{
+    position: 'absolute', 
+    top: 0, 
+    bottom: 0,
+    right: 80,
     backgroundColor: Colors.tabIconDefault,
     width: 80,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  TouchableHighlightDelete:{
+  backDelete:{
+    position: 'absolute', 
+    top: 0, 
+    bottom: 0,
+    right: 0,
     backgroundColor: Colors.dangerColor,
     width: 80,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
   }
 });

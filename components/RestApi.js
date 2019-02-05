@@ -132,17 +132,17 @@ export async function changeThingAvailability(thingid, availability) {
 
 export async function uploadImage(image) {
     const token = await AsyncStorage.getItem('userToken');
-    const formData = new FormData();
-    formData.append('file', image);
-
     return new Promise((resolve, reject) => {
         fetch(`${RESTAPI_URL}/upload`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
-                'Content-Type': 'multipart/form-data',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
             },
-            body: formData,
+            body: JSON.stringify({
+                image: image
+            }),
         })
         .then((resp) => {
             return resp.json();

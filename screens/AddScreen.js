@@ -2,7 +2,6 @@ import React from 'react';
 import { View, StyleSheet, TouchableOpacity, ScrollView, AsyncStorage, Dimensions, Image } from 'react-native';
 import { Button, Text, Icon } from 'native-base';
 import ImagePicker from 'react-native-image-picker';
-import ImageResizer from 'react-native-image-resizer';
 import MapView from 'react-native-maps';
 import jwtDecode from 'jwt-decode';
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -30,7 +29,7 @@ export default class AddScreen extends React.Component {
       longitude: 144.9633281,
     }
 
-    //this.picturesPath =[];
+    this.picturesData =[];
     this.picturesUploaded =[];
 
   }
@@ -220,6 +219,10 @@ export default class AddScreen extends React.Component {
   takePicture = () => {
     const options = {
       title: 'Select a Picture',
+      quality: 0.5,
+      mediaType: 'photo',
+      maxWidth: 1024,
+      maxHeight: 1024,
       storageOptions: {
         skipBackup: true,
         path: 'images',
@@ -229,24 +232,12 @@ export default class AddScreen extends React.Component {
       if (response.didCancel) {}
       else if (response.error) {}
       else {
-        this.addPictureToState(response.uri);
+        this.picturesData.push(response.data);
+        this.setState(prevState => ({
+          pictures: [...prevState.pictures, response.uri]
+        }));
+        this.enablePublishButton();
       }
-    });
-  }
-
-  addPictureToState = (uri) => {
-    ImageResizer.createResizedImage(uri, 1024, 1024, 'JPEG', 50, 0, null).then((response) => {
-      // response.uri is the URI of the new image that can now be displayed, uploaded...
-      // response.path is the path of the new image
-      // response.name is the name of the new image with the extension
-      // response.size is the size of the new image
-      //this.picturesPath.push(response.path);
-      this.setState(prevState => ({
-        pictures: [...prevState.pictures, response.uri]
-      }));
-      this.enablePublishButton();
-    }).catch((err) => {
-      console.log(err);
     });
   }
 
@@ -272,7 +263,7 @@ export default class AddScreen extends React.Component {
     this.setState({spinner: true});
 
     // upload pictures before, the server will return the image name
-    this.state.pictures.forEach((image, index) => {
+    this.picturesData.forEach((image, index) => {
       uploadImage(image).then(res => {
         if ( typeof res.filename === 'string' ){
           this.picturesUploaded.push(res.filename);
@@ -289,7 +280,7 @@ export default class AddScreen extends React.Component {
   // function called each time a picture is uploaded, if so, add the thing to the Rest Api
   checkImagesUploaded = () => {
     
-    if( this.picturesUploaded.length == this.state.pictures.length ){
+    if( this.picturesUploaded.length == this.picturesData.length ){
 
       // upload the thing object
       addThings("pickup", 

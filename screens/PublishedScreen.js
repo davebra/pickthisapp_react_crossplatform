@@ -29,7 +29,7 @@ export default class PublishedScreen extends React.Component {
             <Text style={styles.pubText}>Thanks {this.state.nickname}! This items has been published and is live! Everybody can see it and, if they need it, pick this up!</Text>
             <View style={styles.skipContainer}>
             <Button transparent dark onPress={() => { this.props.navigation.goBack(); }}>
-                <Text style={{color: Colors.darkColor}}>Back to add another Thing</Text>
+                <Text style={style.buttonGoBack}>Go back and add something else!</Text>
             </Button>
             </View>
         </View>
@@ -66,10 +66,13 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   skipContainer:{
+    marginTop: 18,
     flexDirection:'row',
     justifyContent:'center'
   },
-  swiperPagination:{
-    marginBottom: 24
+  buttonGoBack: {
+    color: Colors.darkColor,
+    fontSize: 12,
+    fontWeight: 'bold'
   }
 });
