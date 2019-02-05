@@ -1,6 +1,7 @@
 import React from 'react';
 import {StyleSheet, Dimensions, Image, View } from 'react-native';
 import { Button, Text } from 'native-base';
+import Colors from '../constants/Colors';
 
 export default class PublishedScreen extends React.Component {
     static navigationOptions = {
@@ -28,7 +29,7 @@ export default class PublishedScreen extends React.Component {
             <Text style={styles.pubText}>Thanks {this.state.nickname}! This items has been published and is live! Everybody can see it and, if they need it, pick this up!</Text>
             <View style={styles.skipContainer}>
             <Button transparent dark onPress={() => { this.props.navigation.goBack(); }}>
-                <Text>Back to add another Thing</Text>
+                <Text style={{color: Colors.darkColor}}>Back to add another Thing</Text>
             </Button>
             </View>
         </View>

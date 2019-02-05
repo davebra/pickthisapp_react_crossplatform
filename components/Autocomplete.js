@@ -1,23 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {
-  FlatList,
-  ScrollView,
-  Platform,
-  StyleSheet,
-  TextInput,
-  View,
-  ViewPropTypes as RNViewPropTypes
-} from 'react-native';
+import { View, ViewPropTypes as RNViewPropTypes } from 'react-native';
 import { Text, Item, Label, Input } from 'native-base';
-import Colors from '../constants/Colors';
 
 const ViewPropTypes = RNViewPropTypes || View.propTypes;
 
 class Autocomplete extends Component {
   static propTypes = {
-    ...TextInput.propTypes,
-    containerStyle: ViewPropTypes.style,
+    ...Input.propTypes,
     data: PropTypes.array,
     hideResults: PropTypes.bool,
     inputContainerStyle: ViewPropTypes.style,
@@ -25,13 +15,10 @@ class Autocomplete extends Component {
       PropTypes.string,
       PropTypes.bool
     ]),
-    listContainerStyle: ViewPropTypes.style,
     onShowResults: PropTypes.func,
     onStartShouldSetResponderCapture: PropTypes.func,
     renderItem: PropTypes.func,
-    renderSeparator: PropTypes.func,
     renderTextInput: PropTypes.func,
-    flatListProps: PropTypes.object,
   };
 
   static defaultProps = {
@@ -40,14 +27,7 @@ class Autocomplete extends Component {
     keyboardShouldPersistTaps: 'always',
     onStartShouldSetResponderCapture: () => false,
     renderItem: ({ item }) => <Text>{item}</Text>,
-    renderSeparator: null,
-    renderTextInput: props => (
-      <Item floatingLabel>
-        <Label>Type a tag...</Label>
-        <Input {...props} />
-      </Item>
-      ),
-    flatListProps: {},
+    renderTextInput: props => (<Input {...props} />),
   };
 
   constructor(props) {
@@ -66,20 +46,8 @@ class Autocomplete extends Component {
     this.setState({ data });
   }
 
-  /**
-   * Proxy `blur()` to autocomplete's text input.
-   */
-  blur() {
-    const { textInput } = this;
-    textInput && textInput.blur();
-  }
-
-  /**
-   * Proxy `focus()` to autocomplete's text input.
-   */
-  focus() {
-    const { textInput } = this;
-    textInput && textInput.focus();
+  clear() {
+    this.textInputRef._root.clear();
   }
 
   onRefListView(resultList) {
@@ -88,24 +56,19 @@ class Autocomplete extends Component {
 
   renderResultList() {
     const { data } = this.state;
-    const {
-      renderItem,
-      renderSeparator,
-      keyboardShouldPersistTaps,
-      flatListProps
-    } = this.props;
+    const { renderItem } = this.props;
 
     return (
-      <FlatList
-        ref={this.onRefListView}
-        data={data}
-        keyboardShouldPersistTaps={keyboardShouldPersistTaps}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => index.toString()}
-        //renderSeparator={renderSeparator}
-        style={styles.list}
-        {...flatListProps}
-      />
+      <View style={{
+        marginLeft: 10,
+        marginRight: 10,
+        marginTop: 10,
+        marginBottom: 10,
+        flexDirection: 'row',
+        justifyContent: 'flex-start'
+      }}>
+        {data.map( (item, i) => renderItem(item, i) )}
+      </View>
     );
   }
 
@@ -116,9 +79,12 @@ class Autocomplete extends Component {
   renderTextInput() {
     const { onEndEditing, renderTextInput, style } = this.props;
     const props = {
-      style: [styles.input, style],
-      ref: this.onRefTextInput,
+      style: [style],
+      ref: input => { this.textInputRef = input },
       onEndEditing: e => onEndEditing && onEndEditing(e),
+      autoCapitalize: 'none',
+      autoComplete: 'off',
+      autoCorrect: false,
       ...this.props
     };
 
@@ -128,10 +94,7 @@ class Autocomplete extends Component {
   render() {
     const { data } = this.state;
     const {
-      containerStyle,
       hideResults,
-      inputContainerStyle,
-      listContainerStyle,
       onShowResults,
       onStartShouldSetResponderCapture
     } = this.props;
@@ -141,13 +104,13 @@ class Autocomplete extends Component {
     onShowResults && onShowResults(showResults);
 
     return (
-      <View style={[styles.container, containerStyle]}>
-        <View style={[styles.inputContainer, inputContainerStyle]}>
+      <View>
+        <Item stackedLabel>
+          <Label>Add some tags...</Label>
           {this.renderTextInput()}
-        </View>
+        </Item>
         {!hideResults && (
           <View
-            style={listContainerStyle}
             onStartShouldSetResponderCapture={onStartShouldSetResponderCapture}
           >
             {showResults && this.renderResultList()}
@@ -157,40 +120,5 @@ class Autocomplete extends Component {
     );
   }
 }
-
-const androidStyles = {
-  container: {
-    flex: 1
-  },
-  inputContainer: {
-    marginBottom: 0
-  },
-  list: {
-    backgroundColor: Colors.lightColor,
-    margin: 0,
-  }
-};
-
-const iosStyles = {
-  container: {
-    zIndex: 1
-  },
-  inputContainer: {
-    marginBottom: 0
-  },
-  list: {
-    backgroundColor: Colors.lightColor,
-    left: 0,
-    position: 'absolute',
-    right: 0
-  }
-};
-
-const styles = StyleSheet.create({
-  ...Platform.select({
-    android: { ...androidStyles },
-    ios: { ...iosStyles }
-  })
-});
 
 export default Autocomplete;

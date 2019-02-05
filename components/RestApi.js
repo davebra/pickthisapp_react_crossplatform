@@ -136,7 +136,7 @@ export async function uploadImage(image) {
     formData.append('file', image);
 
     return new Promise((resolve, reject) => {
-        fetch(`${RESTAPI_URL}/things/${thingid}`, {
+        fetch(`${RESTAPI_URL}/upload`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,

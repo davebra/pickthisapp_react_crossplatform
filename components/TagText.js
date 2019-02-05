@@ -4,16 +4,16 @@ import Colors from '../constants/Colors';
 
 export class TagText extends React.Component {
   render() {
-    return <Text {...this.props} style={[this.props.style, { 
-      paddingLeft: 5,
-      paddingRight: 5,
-      paddingTop: 2,
-      paddingBottom: 2,
-      marginRight: 4,
+    return <Text {...this.props} style={[{ 
+      paddingLeft: 6,
+      paddingRight: 6,
+      paddingTop: 3,
+      paddingBottom: 3,
+      marginRight: 5,
       backgroundColor: Colors.secondaryColor,
-      color: 'white',
+      color: '#fff',
       borderRadius: 3,
       overflow: 'hidden'
-      }]} />;
+      }, this.props.style]} />;
   }
 }

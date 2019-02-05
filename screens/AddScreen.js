@@ -30,6 +30,9 @@ export default class AddScreen extends React.Component {
       longitude: 144.9633281,
     }
 
+    //this.picturesPath =[];
+    this.picturesUploaded =[];
+
   }
 
   static navigationOptions = {
@@ -57,7 +60,7 @@ export default class AddScreen extends React.Component {
       <ScrollView style={styles.container}>
         <Spinner
           visible={this.state.spinner}
-          textContent={'Loading...'}
+          textContent={'Publishing...'}
           color={Colors.darkColor}
           textStyle={{color: Colors.darkColor}}
         />
@@ -91,7 +94,7 @@ export default class AddScreen extends React.Component {
           style={styles.addmap}
           initialRegion={{
             latitude: this.thingPosition.latitude,
-            longitude:this.thingPosition.longitude,
+            longitude: this.thingPosition.longitude,
             latitudeDelta: 0.2,
             longitudeDelta: 0.2,
           }}
@@ -106,22 +109,30 @@ export default class AddScreen extends React.Component {
 
           <View style={styles.tagsContainer}>
           {this.state.tags.map( (tag, j) => (
-            <TagText key={j} style={{fontSize: 18}}>{tag}</TagText>
+            <View key={j} style={styles.tagView}>
+              <Text style={styles.tagText}>{tag}</Text>
+              <TouchableOpacity
+                style={styles.tagRemove}
+                onPress={() => { this.removeTag(j) }}>
+                <Icon type='AntDesign' name="plus" size={12} style={{
+                  transform: [{rotate: '45deg'}],
+                  color: Colors.lightColor
+                  }} />
+              </TouchableOpacity>
+            </View>
           ))}
           </View>
 
           <View style={styles.tagsFinder}>
             <Autocomplete
-              autoCapitalize="none"
-              autoCorrect={false}
+              ref={input => { this.textInput = input }}
               data={this.state.tagsAutocomplete}
               onChangeText={text => { this.searchTags(text) }}
-              renderItem={(suggestion) => 
+              renderItem={(suggestion, index) => 
                 <TouchableOpacity 
-                  key={suggestion.index.toString()} 
-                  style={styles.tagsFinderItem}
-                  onPress={() => { this.addTag(suggestion.item.name) }}>
-                  <Text>{suggestion.item.name}</Text>
+                  key={index} 
+                  onPress={() => { this.addTag(suggestion.name) }}>
+                  <TagText style={{backgroundColor: Colors.lightColor, color: '#000'}}>{suggestion.name}</TagText>
                 </TouchableOpacity>
               }
             />
@@ -130,11 +141,11 @@ export default class AddScreen extends React.Component {
           <Button 
             iconLeft block 
             onPress={this.publishThing} 
-            style={styles.publishButton}
+            style={[styles.publishButton, (this.state.publishButtonDisable)?styles.publishButtonDisabled:{}]}
             disabled={this.state.publishButtonDisable}
             >
-            <Icon type='Entypo' name="select-arrows" style={styles.iconButton} />
-            <Text style={styles.buttonText}>UPDATE AVAILABILITY</Text>
+            <Icon type='FontAwesome' name="send" style={styles.iconButton} />
+            <Text style={styles.buttonText}>PUBLISH THING</Text>
           </Button>
 
       </ScrollView>
@@ -169,17 +180,19 @@ export default class AddScreen extends React.Component {
     
     if(this.state.tags.indexOf(addTheTag) < 0){
       this.setState(prevState => ({
-        tags: [...prevState.tags, addTheTag]
+        tags: [...prevState.tags, addTheTag],
+        tagsAutocomplete: []
       }));
+      this.textInput.clear();
       this.enablePublishButton();
     }
 
   }
 
-  removeTag = (tag) => {
-    let tagsSelected = this.state.tags;
-    tagsSelected.splice(index, 1);
-    this.setState({ tags });
+  removeTag = (index) => {
+    this.setState((prevState) => ({
+      tags: [...prevState.tags.slice(0,index), ...prevState.tags.slice(index+1)]
+    }));
     this.enablePublishButton();
   }
 
@@ -200,8 +213,8 @@ export default class AddScreen extends React.Component {
   };
 
   onRegionChangeComplete = (region) => {
-    this.thingPosition.latitude =  region.latitude;
-    this.thingPosition.longitude =  region.longitude;
+    this.thingPosition.latitude = region.latitude;
+    this.thingPosition.longitude = region.longitude;
   }
 
   takePicture = () => {
@@ -227,6 +240,7 @@ export default class AddScreen extends React.Component {
       // response.path is the path of the new image
       // response.name is the name of the new image with the extension
       // response.size is the size of the new image
+      //this.picturesPath.push(response.path);
       this.setState(prevState => ({
         pictures: [...prevState.pictures, response.uri]
       }));
@@ -253,11 +267,64 @@ export default class AddScreen extends React.Component {
 
   // function to open the single Thing screen passing the object content
   publishThing = () => {
+
+    // show loading alert
+    this.setState({spinner: true});
+
+    // upload pictures before, the server will return the image name
+    this.state.pictures.forEach((image, index) => {
+      uploadImage(image).then(res => {
+        if ( typeof res.filename === 'string' ){
+          this.picturesUploaded.push(res.filename);
+          this.checkImagesUploaded();
+        } else {
+          console.log(res);
+          this.setState({ spinner: false });
+        }
+      });
+    });
     
   };
 
+  // function called each time a picture is uploaded, if so, add the thing to the Rest Api
+  checkImagesUploaded = () => {
+    
+    if( this.picturesUploaded.length == this.state.pictures.length ){
+
+      // upload the thing object
+      addThings("pickup", 
+        this.thingPosition.latitude, 
+        this.thingPosition.longitude, 
+        this.state.tags,
+        this.picturesUploaded).then(res => { 
+        if( typeof res._id === "string" ){
+          this.thingPublished();
+        } else {
+          console.log(res);
+        }
+      }).catch(err => { 
+        console.log(err);
+      });
+
+    }
+
+  };  
+
   // function to open the single Thing screen passing the object content
   thingPublished = () => {
+    
+    // empty state and objects
+    this.setState({
+      spinner: false,
+      pictures: [],
+      tagsAutocomplete: [],
+      tagsAutocompleteAdd: [],
+      tags: [],
+      publishButtonDisable: true
+    });
+    this.picturesUploaded = [];
+
+    // go to success page
     this.props.navigation.navigate('Published',{
         nickname: this.state.userData.nickname
     });
@@ -329,20 +396,34 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  tagsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    padding: 16,
-  },
   tagsFinder: {
     paddingLeft: 16,
     paddingRight: 16,
   },
-  tagsFinderItem: {
+  tagsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    flexWrap: 'wrap',
+    padding: 16,
+  },
+  tagView: {
+    backgroundColor: Colors.secondaryColor,
+    marginRight: 6,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
     paddingLeft: 10,
-    paddingRight: 10,
-    paddingTop: 5,
-    paddingBottom: 5,
+    paddingRight: 6,
+    paddingTop: 4,
+    paddingBottom: 3,
+    borderRadius: 5,
+  },
+  tagText: {
+    fontSize: 20,
+    color: '#fff',
+  },
+  tagRemove: {
+    marginLeft: 4,
   },
   publishButton: {
     marginTop: 24,
@@ -353,4 +434,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primaryColor,
     borderColor: Colors.noticeText,
   },
+  publishButtonDisabled: {
+    opacity: 0.5,
+},
 });

@@ -6,6 +6,7 @@ import { S3_BUCKET_URL } from 'react-native-dotenv';
 import { TagText } from '../components/TagText';
 import { showLocation } from 'react-native-map-link';
 import ActionSheet from 'react-native-actionsheet';
+import Lightbox from 'react-native-lightbox';
 
 import { changeThingAvailability, changeThingStatus } from '../components/RestApi';
 import Colors from '../constants/Colors';
@@ -32,10 +33,12 @@ export default class ThingScreen extends React.Component {
       paginationStyle={styles.swiperPagination}>
       {this.state.thing.images.map( (image, i) => (
         <View key={i} style={{ width, height: height * 0.5 }}>
+          <Lightbox>
             <Image
               style={{ height: width, height: height * 0.5 }}
               source={{uri: `${S3_BUCKET_URL}${image}`}}
             />
+          </Lightbox>
         </View>
       ))}
       </SwiperFlatList>
