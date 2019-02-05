@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet, TouchableOpacity, ScrollView, AsyncStorage, Dimensions, Image } from 'react-native';
 import { Button, Text, Icon } from 'native-base';
 import ImagePicker from 'react-native-image-picker';
+import ImageResizer from 'react-native-image-resizer';
 import MapView from 'react-native-maps';
 import jwtDecode from 'jwt-decode';
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -20,7 +21,8 @@ export default class AddScreen extends React.Component {
       pictures: [],
       tagsAutocomplete: [],
       tagsAutocompleteAdd: [],
-      tags: []
+      tags: [],
+      publishButtonDisable: true
     };
 
     this.thingPosition = {
@@ -125,6 +127,16 @@ export default class AddScreen extends React.Component {
             />
           </View>
 
+          <Button 
+            iconLeft block 
+            onPress={this.publishThing} 
+            style={styles.publishButton}
+            disabled={this.state.publishButtonDisable}
+            >
+            <Icon type='Entypo' name="select-arrows" style={styles.iconButton} />
+            <Text style={styles.buttonText}>UPDATE AVAILABILITY</Text>
+          </Button>
+
       </ScrollView>
     );
   }
@@ -159,6 +171,7 @@ export default class AddScreen extends React.Component {
       this.setState(prevState => ({
         tags: [...prevState.tags, addTheTag]
       }));
+      this.enablePublishButton();
     }
 
   }
@@ -167,6 +180,7 @@ export default class AddScreen extends React.Component {
     let tagsSelected = this.state.tags;
     tagsSelected.splice(index, 1);
     this.setState({ tags });
+    this.enablePublishButton();
   }
 
   // function executed when the location of the user has been found by MapView
@@ -202,16 +216,23 @@ export default class AddScreen extends React.Component {
       if (response.didCancel) {}
       else if (response.error) {}
       else {
-        this.setState(prevState => ({
-          pictures: [...prevState.pictures, response.uri]
-        }));
-        // response.fileName
-        // response.path
-        // response.type
-        // response.uri
-        // response.width
-        // response.height
+        this.addPictureToState(response.uri);
       }
+    });
+  }
+
+  addPictureToState = (uri) => {
+    ImageResizer.createResizedImage(uri, 1024, 1024, 'JPEG', 50, 0, null).then((response) => {
+      // response.uri is the URI of the new image that can now be displayed, uploaded...
+      // response.path is the path of the new image
+      // response.name is the name of the new image with the extension
+      // response.size is the size of the new image
+      this.setState(prevState => ({
+        pictures: [...prevState.pictures, response.uri]
+      }));
+      this.enablePublishButton();
+    }).catch((err) => {
+      console.log(err);
     });
   }
 
@@ -219,7 +240,21 @@ export default class AddScreen extends React.Component {
     let newPictures = [...this.state.pictures];
     newPictures.splice(i, 1);
     this.setState({pictures: newPictures});
+    this.enablePublishButton();
   }
+
+  enablePublishButton = () => {
+    if( this.state.pictures.length > 0 && this.state.tags.length > 0 ){
+      if (this.state.publishButtonDisable) this.setState({publishButtonDisable: false});
+    } else {
+      if (!this.state.publishButtonDisable) this.setState({publishButtonDisable: true});
+    }
+  }
+
+  // function to open the single Thing screen passing the object content
+  publishThing = () => {
+    
+  };
 
   // function to open the single Thing screen passing the object content
   thingPublished = () => {
@@ -308,5 +343,14 @@ const styles = StyleSheet.create({
     paddingRight: 10,
     paddingTop: 5,
     paddingBottom: 5,
+  },
+  publishButton: {
+    marginTop: 24,
+    marginBottom: 32,
+    marginLeft: 16,
+    marginRight: 16,
+    height: 52,
+    backgroundColor: Colors.primaryColor,
+    borderColor: Colors.noticeText,
   },
 });
