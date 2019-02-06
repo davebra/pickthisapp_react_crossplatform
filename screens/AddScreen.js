@@ -10,6 +10,7 @@ import Autocomplete from '../components/Autocomplete';
 import { getTags, uploadImage, addThings } from '../components/RestApi';
 import { TagText } from '../components/TagText';
 import Fonts from '../constants/Fonts';
+import Toast, {DURATION} from 'react-native-easy-toast';
 
 export default class AddScreen extends React.Component {
 
@@ -37,6 +38,13 @@ export default class AddScreen extends React.Component {
 
   static navigationOptions = {
     title: 'Add a new Thing',
+    headerTitleStyle: {
+      fontFamily: Fonts.fontBold
+    },
+    headerStyle: {
+      backgroundColor: Colors.appBackground
+    },
+    headerTintColor: Colors.primaryColor,
   };
 
   // execute immediatly after Add Screen is mounted
@@ -57,6 +65,7 @@ export default class AddScreen extends React.Component {
 
   render() {
     return (
+      <View style={{flex:1}}>
       <ScrollView style={styles.container}>
         <Spinner
           visible={this.state.spinner}
@@ -147,8 +156,15 @@ export default class AddScreen extends React.Component {
             <Icon type='FontAwesome' name="send" style={styles.iconButton} />
             <Text style={styles.buttonText}>Publish this Thing</Text>
           </Button>
-
       </ScrollView>
+      <Toast 
+          ref="toastError"
+          style={{backgroundColor: Colors.dangerColor}} 
+          position={'bottom'} 
+          positionValue={240} 
+          opacity={0.85} 
+          textStyle={{fontFamily:Fonts.fontMedium, color: Colors.lightColor}} />
+      </View>
     );
   }
 
@@ -250,7 +266,7 @@ export default class AddScreen extends React.Component {
   }
 
   enablePublishButton = () => {
-    if( this.state.pictures.length > 0 && this.state.tags.length > 0 ){
+    if( this.picturesData.length > 0 && this.state.tags.length > 0 ){
       if (this.state.publishButtonDisable) this.setState({publishButtonDisable: false});
     } else {
       if (!this.state.publishButtonDisable) this.setState({publishButtonDisable: true});
@@ -272,6 +288,7 @@ export default class AddScreen extends React.Component {
         } else {
           console.log(res);
           this.setState({ spinner: false });
+          this.refs.toastError.show('Oooops, something wen wrong, please try again later', DURATION.LENGTH_LONG);
         }
       });
     });
@@ -292,9 +309,13 @@ export default class AddScreen extends React.Component {
         if( typeof res._id === "string" ){
           this.thingPublished();
         } else {
+          this.setState({spinner: false});
+          this.refs.toastError.show('Oooops, something wen wrong, please try again later', DURATION.LENGTH_LONG);
           console.log(res);
         }
       }).catch(err => { 
+        this.setState({spinner: false});
+        this.refs.toastError.show('Oooops, something wen wrong, please try again later', DURATION.LENGTH_LONG);
         console.log(err);
       });
 

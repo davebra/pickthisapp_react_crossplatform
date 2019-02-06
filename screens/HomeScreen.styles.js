@@ -1,5 +1,6 @@
 import { StyleSheet, Dimensions } from 'react-native';
 import Colors from '../constants/Colors';
+import Fonts from '../constants/Fonts';
 
 export const { width, height } = Dimensions.get('window');
 
@@ -38,6 +39,7 @@ export default StyleSheet.create({
   },
   popoverTitle: {
     textAlign: 'center',
+    fontFamily: Fonts.fontMedium,
     marginTop: 24,
   },
   popoverPicker: {

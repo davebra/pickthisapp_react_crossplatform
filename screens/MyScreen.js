@@ -8,6 +8,8 @@ import { getUserThings, changeThingStatus } from '../components/RestApi';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { S3_BUCKET_URL } from 'react-native-dotenv';
 import Timestamp from 'react-timestamp';
+import Fonts from '../constants/Fonts';
+import Toast, {DURATION} from 'react-native-easy-toast';
 
 export default class MyScreen extends React.Component {
 
@@ -23,7 +25,14 @@ export default class MyScreen extends React.Component {
 
   static navigationOptions = ({ navigation }) => {
     return {
-    title: 'My Things',
+    title: 'Things I Posted',
+    headerTitleStyle: {
+      fontFamily: Fonts.fontBold
+    },
+    headerStyle: {
+      backgroundColor: Colors.appBackground
+    },
+    headerTintColor: Colors.primaryColor,
     headerRight: <TouchableHighlight title='user'
                   onPress={() => { navigation.navigate('Login') }}
                   >
@@ -124,6 +133,12 @@ export default class MyScreen extends React.Component {
         disableRightSwipe={true}
         rightOpenValue={-160}
       />
+        <Toast 
+          ref="toast" 
+          position={'bottom'} 
+          positionValue={240} 
+          opacity={0.85} 
+          textStyle={{fontFamily:Fonts.fontMedium, color: Colors.lightColor}} />
       </View>
     );
   }
@@ -142,6 +157,9 @@ export default class MyScreen extends React.Component {
             userThings: res,
             spinner: false
           });
+          if (res.length < 1){
+            this.refs.toast.show('You have no Things published', DURATION.LENGTH_LONG);
+          }
         }
       }).catch(err => { 
         console.log(err) 

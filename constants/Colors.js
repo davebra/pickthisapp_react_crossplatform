@@ -3,8 +3,10 @@ const secondaryColor = '#4F8B5D';
 const dangerColor = '#D84F52';
 const lightColor = '#f4f4f4';
 const darkColor = '#222';
+const appBackground = '#F0F8FF';
 
 export default {
+  appBackground,
   primaryColor,
   secondaryColor,
   dangerColor,

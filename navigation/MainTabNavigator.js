@@ -12,6 +12,7 @@ import PublishedScreen from '../screens/PublishedScreen';
 import MyScreen from '../screens/MyScreen';
 import IntroScreen from '../screens/IntroScreen';
 import LoginScreen from '../screens/LoginScreen';
+import Colors from '../constants/Colors';
 
 const HomeThingStack = createStackNavigator({
   Home: HomeScreen,
@@ -125,6 +126,7 @@ export default createBottomTabNavigator({
   tabBarOptions: {
     style: {
       height: 56,
+      backgroundColor: Colors.appBackground
     },
   }
 }

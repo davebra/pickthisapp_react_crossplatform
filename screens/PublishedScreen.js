@@ -1,7 +1,8 @@
 import React from 'react';
 import {StyleSheet, Dimensions, Image, View } from 'react-native';
-import { Button, Text } from 'native-base';
+import { Button, Text, H2 } from 'native-base';
 import Colors from '../constants/Colors';
+import Fonts from '../constants/Fonts';
 
 export default class PublishedScreen extends React.Component {
     static navigationOptions = {
@@ -25,11 +26,11 @@ export default class PublishedScreen extends React.Component {
                 resizeMode='contain'
                 source={require('../assets/images/intro3.png')} />
             </View>
-            <Text style={styles.pubTitle}>Thing Published!!</Text>
+            <H2 style={styles.pubTitle}>Thing Published!!</H2>
             <Text style={styles.pubText}>Thanks {this.state.nickname}! This items has been published and is live! Everybody can see it and, if they need it, pick this up!</Text>
             <View style={styles.skipContainer}>
             <Button transparent dark onPress={() => { this.props.navigation.goBack(); }}>
-                <Text style={style.buttonGoBack}>Go back and add something else!</Text>
+                <Text style={styles.buttonGoBack}>Go back and add something else!</Text>
             </Button>
             </View>
         </View>
@@ -56,14 +57,16 @@ const styles = StyleSheet.create({
     marginTop: 24,
     marginLeft: 16,
     marginRight: 16,
-    textAlign: 'center'
+    textAlign: 'center',
+    fontFamily: Fonts.fontLight,
   },
   pubText: {
     marginLeft: 16,
     marginRight: 16,
     marginTop: 16,
     marginBottom: 20,
-    textAlign: 'center'
+    textAlign: 'center',
+    fontFamily: Fonts.fontRegular,
   },
   skipContainer:{
     marginTop: 18,
@@ -73,6 +76,7 @@ const styles = StyleSheet.create({
   buttonGoBack: {
     color: Colors.darkColor,
     fontSize: 12,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    fontFamily: Fonts.fontMedium,
   }
 });

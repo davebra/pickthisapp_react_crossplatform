@@ -8,6 +8,9 @@ import { S3_BUCKET_URL } from 'react-native-dotenv';
 import { TagText } from '../components/TagText';
 import styles from './HomeScreen.styles.js';
 import { getThings } from '../components/RestApi';
+import Fonts from '../constants/Fonts';
+import Colors from '../constants/Colors';
+import Toast, {DURATION} from 'react-native-easy-toast';
 
 export default class HomeScreen extends React.Component {
   state = {
@@ -34,12 +37,14 @@ export default class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     const { params = {} } = navigation.state;
     return {
-      title: 'Home',
       headerTitle: (
         <View>
           <Image source={require('../assets/images/logotop.png')} />
         </View>
       ),
+      headerStyle: {
+        backgroundColor: Colors.appBackground
+      },
       headerRight: <TouchableOpacity onPress={params.openFilters} title='filter'>
                     <Icon 
                     type='MaterialCommunityIcons' 
@@ -47,7 +52,7 @@ export default class HomeScreen extends React.Component {
                     size={28} 
                     style={styles.iconFilter} />
                   </TouchableOpacity>
-    }
+      }
   };
 
   // execute immediatly after Home Screen is mounted
@@ -134,7 +139,7 @@ export default class HomeScreen extends React.Component {
                 </TouchableOpacity>
                 <Content style={styles.thingSlideRight}>
                     <CardItem header>
-                    <Text>Here there are:</Text>
+                    <Text style={{fontFamily: Fonts.fontLight}}>Here there are:</Text>
                     </CardItem>
                     <CardItem>
                       <Body style={styles.tagsContainer}>
@@ -144,7 +149,7 @@ export default class HomeScreen extends React.Component {
                       </Body>
                     </CardItem>
                     <CardItem footer>
-                    <Text note>Availability: 
+                    <Text note style={{fontFamily: Fonts.fontRegular}}>Availability: 
                       {{
                           ['full']: ` Great!`,
                           ['medium']: ` Good`,
@@ -181,9 +186,13 @@ export default class HomeScreen extends React.Component {
           </Picker>
           </View>
         </Popover>
-
+        <Toast 
+          ref="toast" 
+          position={'bottom'} 
+          positionValue={240} 
+          opacity={0.85} 
+          textStyle={{fontFamily:Fonts.fontMedium, color: Colors.lightColor}} />
       </View>
-
     );
   }
 
@@ -257,8 +266,12 @@ export default class HomeScreen extends React.Component {
             region.longitude + region.longitudeDelta
         )
         ).then(res => { 
+            if( typeof res.message === 'string' ){
+              this.refs.toast.show('Please zoom in to search', DURATION.FOREVER);
+            }
             if( Array.isArray(res) ){
-                let newThings = [];
+              this.refs.toast.close();
+              let newThings = [];
                 res.forEach(thing => {
                     if (!this.downloadedThings.includes(thing._id)) {
                         newThings.push(thing);
@@ -271,7 +284,6 @@ export default class HomeScreen extends React.Component {
                         thingsMarkers: this.state.thingsMarkers.concat(newThings)
                     });
                 }
-
             }
         }).catch(err => { 
             console.log(err) 

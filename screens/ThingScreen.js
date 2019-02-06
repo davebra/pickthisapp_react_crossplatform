@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, ScrollView, Dimensions, Image, AsyncStorage, Alert, View } from 'react-native';
+import { StyleSheet, ScrollView, Dimensions, Image, AsyncStorage, View } from 'react-native';
 import { Button, Text, H2, H3, Icon } from 'native-base';
 import SwiperFlatList from 'react-native-swiper-flatlist';
 import { S3_BUCKET_URL } from 'react-native-dotenv';
@@ -7,13 +7,22 @@ import { TagText } from '../components/TagText';
 import { showLocation } from 'react-native-map-link';
 import ActionSheet from 'react-native-actionsheet';
 import Lightbox from 'react-native-lightbox';
+import Toast, {DURATION} from 'react-native-easy-toast';
 
 import { changeThingAvailability, changeThingStatus } from '../components/RestApi';
 import Colors from '../constants/Colors';
+import Fonts from '../constants/Fonts';
 
 export default class ThingScreen extends React.Component {
   static navigationOptions = {
-    title: 'Thing',
+    title: 'There\'s something here',
+    headerTitleStyle: {
+      fontFamily: Fonts.fontBold
+    },
+    headerStyle: {
+      backgroundColor: Colors.appBackground
+    },
+    headerTintColor: Colors.primaryColor,
   };
 
   constructor(props) {
@@ -26,6 +35,7 @@ export default class ThingScreen extends React.Component {
   render() {
     const { width, height } = Dimensions.get('window');
     return (
+      <View style={{flex: 1}}>
       <ScrollView style={styles.container}>
       <SwiperFlatList 
       style={{ width, height: height * 0.5, backgroundColor: '#000' }} 
@@ -60,7 +70,7 @@ export default class ThingScreen extends React.Component {
         style={styles.oneButton}
         >
         <Icon type='MaterialCommunityIcons' name="car-pickup" style={styles.iconButton} />
-        <Text style={styles.buttonText}>PICK THIS THING UP</Text>
+        <Text style={styles.buttonText}>Drive me here</Text>
       </Button>
       <Button 
         iconLeft block 
@@ -68,8 +78,17 @@ export default class ThingScreen extends React.Component {
         style={styles.oneButton}
         >
         <Icon type='Entypo' name="select-arrows" style={styles.iconButton} />
-        <Text style={styles.buttonText}>UPDATE AVAILABILITY</Text>
+        <Text style={styles.buttonText}>Update availability</Text>
       </Button>
+      <Button 
+        iconLeft block 
+        onPress={this.showInappropriateActionSheet} 
+        style={styles.buttonReport}
+        >
+        <Icon type='MaterialIcons' name="report" style={styles.iconButton} />
+        <Text style={styles.buttonText}>Report inappropriate</Text>
+      </Button>
+      </ScrollView>
       <ActionSheet
           ref={o => this.AvailabilityActionSheet = o}
           title={'What is the availability of this thing?'}
@@ -77,14 +96,6 @@ export default class ThingScreen extends React.Component {
           cancelTouchableHighlightIndex={4}
           onPress={(index) => { this.updateAvailability(index) }}
         />
-      <Button 
-        iconLeft block 
-        onPress={this.showInappropriateActionSheet} 
-        style={styles.buttonReport}
-        >
-        <Icon type='MaterialIcons' name="report" style={styles.iconButton} />
-        <Text style={styles.buttonText}>REPORT INAPPROPRIATE</Text>
-      </Button>
       <ActionSheet
           ref={o => this.InappropriateActionSheet = o}
           title={'What do you want to report?'}
@@ -92,7 +103,19 @@ export default class ThingScreen extends React.Component {
           cancelTouchableHighlightIndex={3}
           onPress={(index) => { this.updateStatus(index) }}
         />
-      </ScrollView>
+        <Toast ref="toastSuccess" 
+          style={{backgroundColor:Colors.secondaryColor}}
+          position={'bottom'} 
+          positionValue={240} 
+          opacity={0.85} 
+          textStyle={{fontFamily:Fonts.fontMedium, color: Colors.lightColor}} />
+        <Toast 
+          ref="toastError" 
+          position={'bottom'} 
+          positionValue={240} 
+          opacity={0.85} 
+          textStyle={{fontFamily:Fonts.fontMedium, color: Colors.lightColor}} />
+      </View>
     );
   }
 
@@ -135,7 +158,7 @@ export default class ThingScreen extends React.Component {
       return;
     }
     changeThingAvailability(this.state.thing._id, av).then(res => { 
-      this.showAlert('Availability Updated!', 'Thanks for update the availability of this thing!');
+      this.refs.toastSuccess.show('Availability Updated!', DURATION.LENGTH_LONG);
       this.setState(prevState => ({
         thing: {
             ...prevState.thing,
@@ -144,8 +167,8 @@ export default class ThingScreen extends React.Component {
       }));
 
     }).catch(err => { 
-      this.showAlert('Oooops...!', 'Something went wrong during the update, please try again later.');
-      console.log(err) 
+      this.refs.toastError.show('Something wrong during the update, please try again later.', DURATION.LENGTH_LONG);
+      console.log(err) ;
     });
   }
 
@@ -176,22 +199,11 @@ export default class ThingScreen extends React.Component {
       return;
     }
     changeThingStatus(this.state.thing._id, status).then(res => { 
-      this.showAlert('Status Updated!', 'Thanks, your report has been submitted and the staff of Pick This App will review it.');
+      this.refs.toastSuccess.show('Status Updated!', DURATION.LENGTH_LONG);
     }).catch(err => { 
-      this.showAlert('Oooops...!', 'Something went wrong during the update, please try again later.');
+      this.refs.toastError.show('Something wrong during the update, please try again later.', DURATION.LENGTH_LONG);
       console.log(err) 
     });
-  }
-
-  showAlert = (title, text) => {
-    Alert.alert(
-      title,
-      text,
-      [
-        {text: 'OK', onPress: () => console.log('OK Pressed')},
-      ],
-      {cancelable: false},
-    );
   }
 
 }
@@ -221,6 +233,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
+    fontFamily: Fonts.fontMedium
   },
   iconButton: {
     fontSize: 22,
@@ -238,12 +251,14 @@ const styles = StyleSheet.create({
   thingTitle:{
     marginTop: 22,
     paddingLeft: 16,
-    paddingRight: 16
+    paddingRight: 16,
+    fontFamily: Fonts.fontLight,
   },
   thingAvailability: {
     marginBottom: 24,
     paddingLeft: 16,
-    paddingRight: 16
+    paddingRight: 16,
+    fontFamily: Fonts.fontRegular,
   },
   lightboxView: {
     width,

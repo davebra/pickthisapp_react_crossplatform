@@ -256,11 +256,13 @@ const styles = StyleSheet.create({
   },
   loginTitle: {
     textAlign: 'center',
-    marginBottom: 28
+    marginBottom: 28,
+    fontFamily: Fonts.fontLight
   },
   loginBottomText: {
     textAlign: 'center',
-    marginTop: 26
+    marginTop: 26,
+    fontFamily: Fonts.fontLight,
   },
   colorButton: {
     backgroundColor: Colors.primaryColor,
@@ -283,9 +285,11 @@ const styles = StyleSheet.create({
   errorMessage: {
     textAlign: 'center',
     color: '#D84F52',
-    marginTop: 20
+    marginTop: 20,
+    fontFamily: Fonts.fontMedium,
   },
   buttonText:{
-    fontFamily: Fonts.fontMedium
+    fontFamily: Fonts.fontMedium,
+    color: Colors.lightColor,
   }
 });
