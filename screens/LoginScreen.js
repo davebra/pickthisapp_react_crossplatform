@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, AsyncStorage, View, TextInput, ScrollView } from 'react-native';
+import { StyleSheet, AsyncStorage, View, ScrollView } from 'react-native';
 import { Icon, Button, Text, H2, Item, Label, Input } from 'native-base';
 import { loginUser, signupUser } from '../components/RestApi';
 import jwtDecode from 'jwt-decode';
@@ -8,6 +8,7 @@ import Colors from '../constants/Colors';
 import { GOOGLE_AUTH_WEB_CLIENT_ID, GOOGLE_AUTH_IOS_CLIENT_ID } from 'react-native-dotenv';
 //import { LoginManager } from 'react-native-fbsdk';
 import { GoogleSignin, statusCodes } from 'react-native-google-signin';
+import Fonts from '../constants/Fonts';
 
 export default class LoginScreen extends React.Component {
   state = {
@@ -59,11 +60,11 @@ export default class LoginScreen extends React.Component {
             <H2 style={styles.loginTitle}>Do you want to post or update a thing on PickThisApp?</H2>
             <Button iconLeft block style={styles.colorButton} onPress={this.googleAuth}>
               <Icon type='FontAwesome' name="google-plus" style={styles.iconTouchableHighlight} />
-              <Text>JOIN WITH GOOGLE</Text>
+              <Text style={styles.buttonText}>Join with Google</Text>
             </Button>
             <Button iconLeft block style={[styles.colorButton, styles.facebookLoginButton]} onPress={this.facebookAuth}>
               <Icon type='FontAwesome' name="facebook" style={styles.iconTouchableHighlight} />
-              <Text>JOIN WITH FACEBOOK</Text>
+              <Text style={styles.buttonText}>Join with Facebook</Text>
             </Button>
           </View>
         ) : (
@@ -79,19 +80,19 @@ export default class LoginScreen extends React.Component {
               </Item>
               <Button iconLeft block style={[styles.colorButton, styles.confirmNickname]} onPress={this.checkSignupUser}>
               <Icon type='Entypo' name="check" style={styles.iconTouchableHighlight} />
-              <Text>COMPLETE SIGNUP</Text>
+              <Text style={styles.buttonText}>Complete Signup</Text>
             </Button>
             </View>
           ) : (
             <View style={styles.loginContainer}>
-              <Text style={styles.loginTitle}>Hey {this.state.userData.nickname}!</Text>
+              <H2 style={styles.loginTitle}>Hey {this.state.userData.nickname}!</H2>
               <Button iconLeft block light style={styles.logoutButton} onPress={this.executeLogout}>
                 <Icon type='SimpleLineIcons' name="logout" style={styles.logoutIconButton} />
-                <Text>I WANT TO LOGOUT</Text>
+                <Text style={[styles.buttonText, {color: Colors.darkColor}]}>I want to logout</Text>
               </Button>
               <Button iconLeft block style={styles.colorButton} onPress={()=>{this.props.navigation.goBack()}}>
                 <Icon type='AntDesign' name="back" style={styles.iconTouchableHighlight} />
-                <Text>BACK TO YOUR THINGS</Text>
+                <Text style={styles.buttonText}>Go back to your Things</Text>
               </Button>
             </View>
           )
@@ -283,5 +284,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#D84F52',
     marginTop: 20
+  },
+  buttonText:{
+    fontFamily: Fonts.fontMedium
   }
 });

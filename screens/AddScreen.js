@@ -9,6 +9,7 @@ import Colors from '../constants/Colors';
 import Autocomplete from '../components/Autocomplete';
 import { getTags, uploadImage, addThings } from '../components/RestApi';
 import { TagText } from '../components/TagText';
+import Fonts from '../constants/Fonts';
 
 export default class AddScreen extends React.Component {
 
@@ -144,7 +145,7 @@ export default class AddScreen extends React.Component {
             disabled={this.state.publishButtonDisable}
             >
             <Icon type='FontAwesome' name="send" style={styles.iconButton} />
-            <Text style={styles.buttonText}>PUBLISH THING</Text>
+            <Text style={styles.buttonText}>Publish this Thing</Text>
           </Button>
 
       </ScrollView>
@@ -427,5 +428,8 @@ const styles = StyleSheet.create({
   },
   publishButtonDisabled: {
     opacity: 0.5,
-},
+  },
+  buttonText: {
+    fontFamily: Fonts.fontMedium
+  }
 });

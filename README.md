@@ -33,7 +33,6 @@ PickThisApp React Native, Final Assignment project for the Cross Platform subjec
 * react-timestamp (format date time)
 * react-native-fbsdk (library for allow the FB login)
 * react-native-image-picker (library for allow the Google login)
-* react-native-image-resizer (for resize images before upload)
 
 #### Extra Infos
 

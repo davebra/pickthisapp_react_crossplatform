@@ -3,6 +3,7 @@ import {StyleSheet, Dimensions, AsyncStorage, Image, View } from 'react-native';
 import { Button, Text, H1 } from 'native-base';
 
 import SwiperFlatList from 'react-native-swiper-flatlist';
+import Fonts from '../constants/Fonts';
 
 export default class IntroScreen extends React.Component {
 
@@ -26,7 +27,7 @@ export default class IntroScreen extends React.Component {
               <Text style={styles.introText}>With PickThisApp you can find free things around you, owned or just found by other Pick-appers.</Text>
               <View style={styles.skipContainer}>
                 <Button transparent dark onPress={this.closeIntro}>
-                  <Text>Skip Intro</Text>
+                  <Text style={styles.skipIntroText}>Skip Intro</Text>
                 </Button>
               </View>
             </View>
@@ -41,7 +42,7 @@ export default class IntroScreen extends React.Component {
               <Text style={styles.introText}>When you find something interesting and you want to get there, tap "Drive me here" to start your navigator.</Text>
               <View style={styles.skipContainer}>
                 <Button transparent dark onPress={this.closeIntro}>
-                  <Text>Skip Intro</Text>
+                  <Text style={styles.skipIntroText}>Skip Intro</Text>
                 </Button>
               </View>
             </View>
@@ -56,7 +57,7 @@ export default class IntroScreen extends React.Component {
               <Text style={styles.introText}>Do you have something you want to give for free or you just found something on nature strip? Post a thing here is super easy! Take a picture, adjust the position, and post!</Text>
               <View style={styles.skipContainer}>
                 <Button transparent dark onPress={this.closeIntro}>
-                  <Text>Skip Intro</Text>
+                  <Text style={styles.skipIntroText}>Skip Intro</Text>
                 </Button>
               </View>
             </View>
@@ -99,14 +100,16 @@ const styles = StyleSheet.create({
     marginTop: 24,
     marginLeft: 16,
     marginRight: 16,
-    textAlign: 'center'
+    textAlign: 'center',
+    fontFamily: Fonts.fontLight
   },
   introText: {
     marginLeft: 16,
     marginRight: 16,
     marginTop: 16,
     marginBottom: 20,
-    textAlign: 'center'
+    textAlign: 'center',
+    fontFamily: Fonts.fontRegular
   },
   skipContainer:{
     flexDirection:'row',
@@ -114,5 +117,8 @@ const styles = StyleSheet.create({
   },
   swiperPagination:{
     marginBottom: 24
+  },
+  skipIntroText:{
+    fontFamily: Fonts.fontMedium
   }
 });

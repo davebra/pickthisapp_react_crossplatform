@@ -74,7 +74,9 @@ export default class MyScreen extends React.Component {
         renderItem={ (thing, ViewMap) => (
           <ListItem thumbnail style={styles.listItem}>
               <Left>
-                <Thumbnail square source={{uri: `${S3_BUCKET_URL}${thing.item.images[0]}`, cache: 'only-if-cached'}} />
+                <TouchableHighlight onPress={() =>{ this.goToThing(thing.item) }}>
+                  <Thumbnail square source={{uri: `${S3_BUCKET_URL}${thing.item.images[0]}`, cache: 'only-if-cached'}} />
+                </TouchableHighlight>
               </Left>
               <Body>
                 <Text>Thing of <Timestamp time={thing.item.timestamp} format='full' component={Text} /></Text>
@@ -87,7 +89,7 @@ export default class MyScreen extends React.Component {
               </Body>
               <Right>
                 <Button transparent onPress={() =>{ this.goToThing(thing.item) }}>
-                  <Text>View</Text>
+                  <Icon type='Entypo' name="chevron-thin-right" style={{color: '#999'}} size={22} />
                 </Button>
               </Right>
             </ListItem>
@@ -95,27 +97,27 @@ export default class MyScreen extends React.Component {
         renderHiddenItem={ (thing, ViewMap) => (
             <View style={styles.listItemBack}>
               <View style={styles.backPlayPause}>
-                <Button 
-                transparent dark iconLeft large
+                <TouchableHighlight 
+                style={styles.backPlayPauseTouch}
                 onPress={ () => {
-                  ViewMap[thing.index].manuallySwipeView(0);
+                  ViewMap[thing.index].manuallySwipeRow(0);
                   this.clickPauseThing( thing.item._id, (thing.item.status === 'live' ) ? 'paused' : 'live' )
                 }}>
                     {{
                         ['live']: <Icon type='MaterialCommunityIcons' name="pause" size={20} />,
                         ['paused']: <Icon type='MaterialCommunityIcons' name="play" size={20} />,
                     }[thing.item.status]}
-                </Button>
+                </TouchableHighlight>
               </View>
               <View style={styles.backDelete}>
-                <Button 
-                  transparent iconLeft large
-                  onPress={ () => {
-                    ViewMap[thing.index].manuallySwipeView(0);
+                <TouchableHighlight 
+                style={styles.backDeleteTouch}
+                onPress={ () => {
+                    ViewMap[thing.index].manuallySwipeRow(0);
                     this.clickDeleteThing( thing.item._id )
                   }}>
                   <Icon type='FontAwesome' name="trash-o" style={{color: Colors.lightColor}} size={20} />
-                </Button>
+                </TouchableHighlight>
               </View>
             </View>
         )}
@@ -201,9 +203,6 @@ const styles = StyleSheet.create({
     right: 80,
     backgroundColor: Colors.tabIconDefault,
     width: 80,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   backDelete:{
     position: 'absolute', 
@@ -212,6 +211,23 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: Colors.dangerColor,
     width: 80,
+  },
+  backPlayPauseTouch:{
+    position: 'absolute', 
+    top: 0, 
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  backDeleteTouch:{
+    position: 'absolute', 
+    top: 0, 
+    bottom: 0,
+    left: 0,
+    right: 0,
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
