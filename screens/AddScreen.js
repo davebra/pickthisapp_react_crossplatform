@@ -39,7 +39,12 @@ export default class AddScreen extends React.Component {
   static navigationOptions = {
     title: 'Add a new Thing',
     headerTitleStyle: {
-      fontFamily: Fonts.fontBold
+      fontFamily: Fonts.fontBold,
+      fontWeight: '700',
+    },
+    titleStyle: {
+      fontFamily: Fonts.fontBold,
+      fontWeight: '700',
     },
     headerStyle: {
       backgroundColor: Colors.appBackground
@@ -98,23 +103,24 @@ export default class AddScreen extends React.Component {
 
         </View>
 
-        <MapView
-          ref="addmap"
-          style={styles.addmap}
-          initialRegion={{
-            latitude: this.thingPosition.latitude,
-            longitude: this.thingPosition.longitude,
-            latitudeDelta: 0.2,
-            longitudeDelta: 0.2,
-          }}
-          loadingEnabled={true}
-          loadingIndicatorColor="#666666"
-          loadingBackgroundColor="#eeeeee"
-          showsUserLocation={false}
-          showsPointsOfInterest={false}
-          onRegionChangeComplete={this.onRegionChangeComplete}>
-            <Icon type='FontAwesome' name="map-pin" size={42} style={{color: Colors.darkColor, marginTop: -21}} />
-          </MapView>
+        <View style={styles.mapContainer}>
+          <MapView
+            ref="addmap"
+            style={styles.addmap}
+            initialRegion={{
+              latitude: this.thingPosition.latitude,
+              longitude: this.thingPosition.longitude,
+              latitudeDelta: 0.2,
+              longitudeDelta: 0.2,
+            }}
+            loadingEnabled={true}
+            loadingIndicatorColor="#666666"
+            loadingBackgroundColor="#eeeeee"
+            showsUserLocation={false}
+            showsPointsOfInterest={false}
+            onRegionChangeComplete={this.onRegionChangeComplete} />
+          <Icon type='FontAwesome' name="map-pin" size={42} style={styles.centerIcon} />
+        </View>
 
           <View style={styles.tagsContainer}>
           {this.state.tags.map( (tag, j) => (
@@ -418,13 +424,25 @@ const styles = StyleSheet.create({
     right: -10,
     zIndex: 10,
   },
-  addmap: {
+  mapContainer:{
     marginTop: 20,
     width: width,
     height: height * 0.3,
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  addmap: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: width,
+    height: height * 0.3,
+    zIndex: 2
+  },
+  centerIcon: {
+    marginTop: -21,
+    zIndex: 10, 
   },
   tagsFinder: {
     paddingLeft: 16,

@@ -125,8 +125,8 @@ export default class LoginScreen extends React.Component {
       const userInfo = await GoogleSignin.signIn();
       this.checkLoginUser('google', userInfo.user);
     } catch (error) {
+      console.log(error);
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        console.log(`Google Login Canceled`);
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
         this.setState({
           errorMessage: 'Error during login, do you have the Google Play Services installed?',

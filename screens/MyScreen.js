@@ -27,7 +27,8 @@ export default class MyScreen extends React.Component {
     return {
     title: 'Things I Posted',
     headerTitleStyle: {
-      fontFamily: Fonts.fontBold
+      fontFamily: Fonts.fontBold,
+      fontWeight: '700',
     },
     headerStyle: {
       backgroundColor: Colors.appBackground

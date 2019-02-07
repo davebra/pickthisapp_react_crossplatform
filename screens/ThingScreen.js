@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, ScrollView, Dimensions, Image, AsyncStorage, View } from 'react-native';
+import { StyleSheet, ScrollView, Dimensions, Image, AsyncStorage, View, Platform } from 'react-native';
 import { Button, Text, H2, H3, Icon } from 'native-base';
 import SwiperFlatList from 'react-native-swiper-flatlist';
 import { S3_BUCKET_URL } from 'react-native-dotenv';
@@ -17,7 +17,8 @@ export default class ThingScreen extends React.Component {
   static navigationOptions = {
     title: 'There\'s something here',
     headerTitleStyle: {
-      fontFamily: Fonts.fontBold
+      fontFamily: Fonts.fontBold,
+      fontWeight: '700',
     },
     headerStyle: {
       backgroundColor: Colors.appBackground
@@ -32,6 +33,14 @@ export default class ThingScreen extends React.Component {
     }
   }
 
+  renderLightbox = (uri) => (
+    <Image
+      style={{ height: width, height: height}}
+      resizeMode="contain"
+      source={{uri}}
+    />
+  )
+
   render() {
     const { width, height } = Dimensions.get('window');
     return (
@@ -43,7 +52,7 @@ export default class ThingScreen extends React.Component {
       paginationStyle={styles.swiperPagination}>
       {this.state.thing.images.map( (image, i) => (
         <View key={i} style={{ width, height: height * 0.5 }}>
-          <Lightbox>
+          <Lightbox renderContent={() => this.renderLightbox(`${S3_BUCKET_URL}${image}`)}>
             <Image
               style={{ height: width, height: height * 0.5 }}
               source={{uri: `${S3_BUCKET_URL}${image}`}}
@@ -258,7 +267,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     paddingLeft: 16,
     paddingRight: 16,
-    fontFamily: Fonts.fontRegular,
+    fontFamily: Fonts.fontLight,
   },
   lightboxView: {
     width,
@@ -274,7 +283,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#000'
   },
   swiperPagination: {
-    bottom: height * 0.5 + 10
+    position: 'absolute',
+    bottom: Platform.OS === 'ios' ? height * 0.5 - 5 : height * 0.5 + 90,
   }
 
 });

@@ -126,6 +126,7 @@ export default createBottomTabNavigator({
   tabBarOptions: {
     style: {
       height: 56,
+      paddingBottom: Platform.OS === 'ios' ? 0 : 6,
       backgroundColor: Colors.appBackground
     },
   }

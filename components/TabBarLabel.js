@@ -8,6 +8,7 @@ export default class TabBarLabel extends React.Component {
     return (
         <Text style={{
             fontFamily: Fonts.fontMedium,
+            textAlign: 'center',
             color: this.props.focused ? Colors.tabIconSelected : Colors.tabIconDefault 
             }}>{this.props.title}</Text>
     );

@@ -38,8 +38,12 @@ export default class HomeScreen extends React.Component {
     const { params = {} } = navigation.state;
     return {
       headerTitle: (
-        <View>
+        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
           <Image source={require('../assets/images/logotop.png')} />
+        </View>
+      ),
+      headerLeft: (
+        <View>
         </View>
       ),
       headerStyle: {
@@ -139,7 +143,7 @@ export default class HomeScreen extends React.Component {
                 </TouchableOpacity>
                 <Content style={styles.thingSlideRight}>
                     <CardItem header>
-                    <Text style={{fontFamily: Fonts.fontLight}}>Here there are:</Text>
+                    <Text style={styles.tagsTitle}>Here there are:</Text>
                     </CardItem>
                     <CardItem>
                       <Body style={styles.tagsContainer}>

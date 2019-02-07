@@ -1,4 +1,4 @@
-import { StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet, Dimensions, Platform } from 'react-native';
 import Colors from '../constants/Colors';
 import Fonts from '../constants/Fonts';
 
@@ -48,27 +48,33 @@ export default StyleSheet.create({
   thingSlides: {
     position: 'absolute',
     width: width - 32,
-    height: height * 0.2,
+    height: (height * 0.2 > 120) ? height * 0.2 : 120,
     top: 16,
     left: 16,
   },
   thingSlide: {
     width: width - 32,
-    height: height * 0.2,
+    height: (height * 0.2 > 120) ? height * 0.2 : 120,
   },
   thingSlideContent: {
     flexDirection: 'row',
     justifyContent: 'space-evenly'
   },
   thingSlideImage: {
-    width: height * 0.2 - 32,
-    height: height * 0.2 - 48,
-    margin: 16,
-    borderRadius: 4,    
+    width: ((height * 0.2 - 32) > 88) ? height * 0.2 - 32 : 88,
+    height: ((height * 0.2 - 32) > 88) ? height * 0.2 - 32 : 88,
+    margin: Platform.OS === 'ios' ? 16 : 10,
+    borderRadius: 3,    
+  },
+  tagsTitle: {
+    fontFamily: Fonts.fontLight,
+    marginTop: Platform.OS === 'ios' ? 0 : -12,
   },
   tagsContainer: {
     flexDirection: 'row',
     justifyContent: "flex-start",   
+    marginTop: Platform.OS === 'ios' ? 0 : -22,
+    marginBottom: Platform.OS === 'ios' ? 0 : -12,
   },
 });
   
