@@ -144,7 +144,7 @@ export default class HomeScreen extends React.Component {
                     <CardItem>
                       <Body style={styles.tagsContainer}>
                         {marker.tags.map( (tag, j) => (
-                        <TagText key={j}>{tag}</TagText>
+                        <TagText key={j} content={tag} />
                         ))}
                       </Body>
                     </CardItem>

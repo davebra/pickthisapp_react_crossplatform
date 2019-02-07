@@ -26,6 +26,7 @@ export async function loginUser(provider, providerid) {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache',
             },
             body: JSON.stringify({
                 provider,
@@ -48,6 +49,7 @@ export async function signupUser(provider, providerid, nickname) {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache',
             },
             body: JSON.stringify({
                 provider,
@@ -73,6 +75,7 @@ export async function getUserThings(userid) {
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache',
             }
         })
         .then((resp) => {
@@ -93,6 +96,7 @@ export async function changeThingStatus(thingid, status) {
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache',
             },
             body: JSON.stringify({
                 status
@@ -116,6 +120,7 @@ export async function changeThingAvailability(thingid, availability) {
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache',
             },
             body: JSON.stringify({
                 availability
@@ -139,6 +144,7 @@ export async function uploadImage(image) {
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache',
             },
             body: JSON.stringify({
                 image: image
@@ -162,6 +168,7 @@ export async function addThings(type, lat, lng, tags, images) {
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache',
             },
             body: JSON.stringify({
                 type,
@@ -181,14 +188,36 @@ export async function addThings(type, lat, lng, tags, images) {
 }
 
 export async function getTags(text) {
-    console.log(text);
     return new Promise((resolve, reject) => {
         fetch(`${RESTAPI_URL}/tags?s=${text}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json'
             }
+        })
+        .then((resp) => {
+            return resp.json();
+        })
+        .then((resp) => {
+            resolve(resp);
+        });
+    });
+}
+
+export async function addNewTag(tag) {
+    const token = await AsyncStorage.getItem('userToken');
+    return new Promise((resolve, reject) => {
+        fetch(`${RESTAPI_URL}/tags`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                tag
+            }),
         })
         .then((resp) => {
             return resp.json();

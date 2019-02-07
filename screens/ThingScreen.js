@@ -55,7 +55,7 @@ export default class ThingScreen extends React.Component {
       <H2 style={styles.thingTitle}>What's in here:</H2>
       <View style={styles.tagsContainer}>
           {this.state.thing.tags.map( (tag, j) => (
-          <TagText key={j} style={{fontSize: 18}}>{tag}</TagText>
+          <TagText key={j} style={{fontSize: 18}} content={tag} />
           ))}
       </View>
       <H3 style={styles.thingAvailability}>Availability: {{

@@ -7,7 +7,7 @@ import jwtDecode from 'jwt-decode';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Colors from '../constants/Colors';
 import Autocomplete from '../components/Autocomplete';
-import { getTags, uploadImage, addThings } from '../components/RestApi';
+import { getTags, uploadImage, addThings, addNewTag } from '../components/RestApi';
 import { TagText } from '../components/TagText';
 import Fonts from '../constants/Fonts';
 import Toast, {DURATION} from 'react-native-easy-toast';
@@ -141,7 +141,7 @@ export default class AddScreen extends React.Component {
                 <TouchableOpacity 
                   key={index} 
                   onPress={() => { this.addTag(suggestion.name) }}>
-                  <TagText style={{backgroundColor: Colors.lightColor, color: '#000'}}>{suggestion.name}</TagText>
+                  <TagText style={styles.tagsSuggestion} content={suggestion.name} />
                 </TouchableOpacity>
               }
             />
@@ -190,13 +190,30 @@ export default class AddScreen extends React.Component {
     let addTheTag;
     if(tag.indexOf("Add") > -1 && tag.indexOf("...") > -1){
       addTheTag = tag.substr(4, tag.length - 7);
+
+      // add the tag to the server
+      addNewTag(addTheTag).then(res => {
+        if ( typeof res.name === 'string' ){
+          this.addTagToState(res.name);
+        } else {
+          this.refs.toastError.show('Invalid or blacklisted word', DURATION.LENGTH_LONG);
+        }
+      }).catch(err => {
+        this.refs.toastError.show('Invalid or blacklisted word', DURATION.LENGTH_LONG);
+      });
+
     } else {
       addTheTag = tag;
+      this.addTagToState(tag);
     }
-    
-    if(this.state.tags.indexOf(addTheTag) < 0){
+
+  }
+
+  addTagToState = (tagToAdd) => {
+
+    if(this.state.tags.indexOf(tagToAdd) < 0){
       this.setState(prevState => ({
-        tags: [...prevState.tags, addTheTag],
+        tags: [...prevState.tags, tagToAdd],
         tagsAutocomplete: []
       }));
       this.textInput.clear();
@@ -434,6 +451,16 @@ const styles = StyleSheet.create({
   tagText: {
     fontSize: 20,
     color: '#fff',
+    fontFamily: Fonts.fontBold
+  },
+  tagsSuggestion: {
+    backgroundColor: Colors.lightColor, 
+    paddingLeft: 8,
+    paddingRight: 8,
+    paddingTop: 4,
+    paddingBottom: 4,
+    fontSize: 18,
+    color: Colors.darkColor
   },
   tagRemove: {
     marginLeft: 4,
