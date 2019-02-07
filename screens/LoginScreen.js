@@ -6,7 +6,7 @@ import jwtDecode from 'jwt-decode';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Colors from '../constants/Colors';
 import { GOOGLE_AUTH_WEB_CLIENT_ID, GOOGLE_AUTH_IOS_CLIENT_ID } from 'react-native-dotenv';
-//import { LoginManager } from 'react-native-fbsdk';
+import { LoginManager, AccessToken, GraphRequest, GraphRequestManager } from 'react-native-fbsdk';
 import { GoogleSignin, statusCodes } from 'react-native-google-signin';
 import Fonts from '../constants/Fonts';
 
@@ -141,22 +141,19 @@ export default class LoginScreen extends React.Component {
     }
   }
 
-  // function executed when the Facebook TouchableHighlight is clicked
+  // function executed when the Facebook is clicked
   facebookAuth = () => {
     this.setState({
       errorMessage: '',
       showErrorMessage: false
     });
-    LoginManager.logInWithReadPermissions(['public_profile', 'email']).then(
-      function(result) {
+    LoginManager.logInWithReadPermissions(['public_profile', 'email']).then((result) => {
         if (result.isCancelled) {
           console.log(`Facebook Login Canceled`);
         } else {
-          console.log(result);
-          //this.checkLoginUser('facebook', userInfo);
+          this.FBGraphRequest('id, email, name', this.FBLoginCallback);
         }
-      },
-      function(error) {
+      },(error) => {
         console.log(`Facebook Login Error: ${error}`);
         this.setState({
           errorMessage: 'Error during login, please try again or choose a different login method.',
@@ -164,6 +161,30 @@ export default class LoginScreen extends React.Component {
         });
       }
     );
+  }
+
+  // function that retrieve facebook data
+  async FBGraphRequest(fields, callback) {
+    const accessData = await AccessToken.getCurrentAccessToken();
+    // Create a graph request asking for user information
+    const infoRequest = new GraphRequest('/me', {
+      accessToken: accessData.accessToken,
+      parameters: {
+        fields: {
+          string: fields
+        }
+      }
+    }, callback.bind(this));
+    // Execute the graph request created above
+    new GraphRequestManager().addRequest(infoRequest).start();
+  }
+
+  async FBLoginCallback(error, result) {
+    if (error) {
+      console.log(error);
+    } else {
+      this.checkLoginUser('facebook', result);
+    }
   }
 
   checkLoginUser = (prov, userObj) => {

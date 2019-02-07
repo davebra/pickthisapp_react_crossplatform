@@ -7,6 +7,8 @@
 
 #import "AppDelegate.h"
 
+#import <FBSDKCoreKit/FBSDKCoreKit.h>
+#import "RNGoogleSignin.h"
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
 
@@ -15,6 +17,9 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   NSURL *jsCodeLocation;
+  
+  [[FBSDKApplicationDelegate sharedInstance] application:application
+                           didFinishLaunchingWithOptions:launchOptions];
 
   jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
 
@@ -30,6 +35,15 @@
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
   return YES;
+}
+
+- (BOOL)application:(UIApplication *)application openURL:(nonnull NSURL *)url options:(nonnull NSDictionary<NSString *,id> *)options {
+  
+  BOOL fbhandled = [[FBSDKApplicationDelegate sharedInstance] application:application
+                                                                openURL:url sourceApplication:options[UIApplicationOpenURLOptionsSourceApplicationKey] annotation:options[UIApplicationOpenURLOptionsAnnotationKey]];
+  BOOL ghandled = [RNGoogleSignin application:application
+                                                        openURL:url sourceApplication:options[UIApplicationOpenURLOptionsSourceApplicationKey] annotation:options[UIApplicationOpenURLOptionsAnnotationKey]];
+  return fbhandled || ghandled;
 }
 
 @end
