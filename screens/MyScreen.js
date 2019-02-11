@@ -50,22 +50,8 @@ export default class MyScreen extends React.Component {
     };
   }
 
-  // execute immediatly after My Screen is mounted
-  componentDidMount() {
-
-    // check if is the user is already logged in, if not, open Login
-    AsyncStorage.getItem('userToken').then( value => {
-      if (value == null) {
-        this.props.navigation.navigate('Login');
-      } else {
-        this.setState({ userData: jwtDecode(value), spinner: true });
-        this.loadMyThings();
-      }
-    });
-
-  }
-
   render() {
+    this.props.navigation.addListener( 'willFocus', payload => { this.checkLogin() } );
     return (
       <View style={{...StyleSheet.absoluteFill}}>
       <Spinner
@@ -142,6 +128,20 @@ export default class MyScreen extends React.Component {
           textStyle={{fontFamily:Fonts.fontMedium, color: Colors.lightColor}} />
       </View>
     );
+  }
+
+  checkLogin = () => {
+
+    // check if is the user is already logged in, if not, open Login
+    AsyncStorage.getItem('userToken').then( value => {
+      if (value == null) {
+        this.props.navigation.navigate('Login');
+      } else {
+        this.setState({ userData: jwtDecode(value), spinner: true });
+        this.loadMyThings();
+      }
+    });
+
   }
 
   // function to open the single Thing screen passing the object content

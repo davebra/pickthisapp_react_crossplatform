@@ -30,22 +30,10 @@ export default class LoginScreen extends React.Component {
       iosClientId: GOOGLE_AUTH_IOS_CLIENT_ID,
     });
 
-    // check if is the user is already logged in
-    AsyncStorage.getItem('userToken').then( value => {
-      if (value == null) {
-        this.setState({ userLogged: false });
-      } else {
-        this.setState({ 
-          userLogged: true, 
-          chooseNickname: false,
-          showErrorMessage: false,
-          userData: jwtDecode(value) });
-      }
-    });
-
   }
 
   render() {
+    this.props.navigation.addListener( 'willFocus', payload => { this.checkLogin() } );
     return (
       <ScrollView contentContainerStyle={styles.container}>
         <Spinner
@@ -104,6 +92,23 @@ export default class LoginScreen extends React.Component {
         <Text style={styles.loginBottomText}>We will never spam, you, that's a promise!</Text>
       </ScrollView>
     );
+  }
+
+  checkLogin = () => {
+
+    // check if is the user is already logged in
+    AsyncStorage.getItem('userToken').then( value => {
+      if (value == null) {
+        this.setState({ userLogged: false });
+      } else {
+        this.setState({ 
+          userLogged: true, 
+          chooseNickname: false,
+          showErrorMessage: false,
+          userData: jwtDecode(value) });
+      }
+    });
+
   }
 
   executeLogout = () => {

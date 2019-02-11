@@ -22,8 +22,7 @@ export default class AddScreen extends React.Component {
       pictures: [],
       tagsAutocomplete: [],
       tagsAutocompleteAdd: [],
-      tags: [],
-      publishButtonDisable: true
+      tags: []
     };
 
     this.thingPosition = {
@@ -52,23 +51,9 @@ export default class AddScreen extends React.Component {
     headerTintColor: Colors.primaryColor,
   };
 
-  // execute immediatly after Add Screen is mounted
-  componentDidMount() {
-
-    // check if is the user is already logged in, if not, open Login
-    AsyncStorage.getItem('userToken').then( value => {
-      if (value == null) {
-        this.props.navigation.navigate('Login');
-      } else {
-        this.setState({ userData: jwtDecode(value) });
-        // load user location
-        this.getUserLocation();
-      }
-    });
-
-  }
-
   render() {
+    var enableButton = this.state.pictures.length && this.state.tags.length;
+    this.props.navigation.addListener( 'willFocus', payload => { this.checkLogin() } );
     return (
       <View style={{flex:1}}>
       <ScrollView style={styles.container}>
@@ -156,8 +141,8 @@ export default class AddScreen extends React.Component {
           <Button 
             iconLeft block 
             onPress={this.publishThing} 
-            style={[styles.publishButton, (this.state.publishButtonDisable)?styles.publishButtonDisabled:{}]}
-            disabled={this.state.publishButtonDisable}
+            style={ (!enableButton) ? styles.publishButtonDisabled : styles.publishButton }
+            disabled={!enableButton}
             >
             <Icon type='FontAwesome' name="send" style={styles.iconButton} />
             <Text style={styles.buttonText}>Publish this Thing</Text>
@@ -174,6 +159,21 @@ export default class AddScreen extends React.Component {
     );
   }
 
+  checkLogin = () => {
+
+    // check if is the user is already logged in, if not, open Login
+    AsyncStorage.getItem('userToken').then( value => {
+      if (value == null) {
+        this.props.navigation.navigate('Login');
+      } else {
+        this.setState({ userData: jwtDecode(value) });
+        // load user location
+        this.getUserLocation();
+      }
+    });
+
+  }
+
   searchTags = (text) => {
     if(text.length > 1){
       getTags(text).then(res => { 
@@ -187,8 +187,6 @@ export default class AddScreen extends React.Component {
       }).catch(err => { 
         console.log(err) 
       });
-    } else {
-      this.setState({tagsAutocomplete: []});
     }
   }
 
@@ -218,12 +216,11 @@ export default class AddScreen extends React.Component {
   addTagToState = (tagToAdd) => {
 
     if(this.state.tags.indexOf(tagToAdd) < 0){
+      this.textInput.clear();
       this.setState(prevState => ({
         tags: [...prevState.tags, tagToAdd],
         tagsAutocomplete: []
       }));
-      this.textInput.clear();
-      this.enablePublishButton();
     }
 
   }
@@ -232,7 +229,6 @@ export default class AddScreen extends React.Component {
     this.setState((prevState) => ({
       tags: [...prevState.tags.slice(0,index), ...prevState.tags.slice(index+1)]
     }));
-    this.enablePublishButton();
   }
 
   // function executed when the location of the user has been found by MapView
@@ -276,24 +272,15 @@ export default class AddScreen extends React.Component {
         this.setState(prevState => ({
           pictures: [...prevState.pictures, response.uri]
         }));
-        this.enablePublishButton();
       }
     });
   }
 
   removePicture = (i) => {
+    this.picturesData.splice(i, 1);
     let newPictures = [...this.state.pictures];
     newPictures.splice(i, 1);
     this.setState({pictures: newPictures});
-    this.enablePublishButton();
-  }
-
-  enablePublishButton = () => {
-    if( this.picturesData.length > 0 && this.state.tags.length > 0 ){
-      if (this.state.publishButtonDisable) this.setState({publishButtonDisable: false});
-    } else {
-      if (!this.state.publishButtonDisable) this.setState({publishButtonDisable: true});
-    }
   }
 
   // function to open the single Thing screen passing the object content
@@ -355,8 +342,7 @@ export default class AddScreen extends React.Component {
       pictures: [],
       tagsAutocomplete: [],
       tagsAutocompleteAdd: [],
-      tags: [],
-      publishButtonDisable: true
+      tags: []
     });
     this.picturesUploaded = [];
 
@@ -493,6 +479,13 @@ const styles = StyleSheet.create({
     borderColor: Colors.noticeText,
   },
   publishButtonDisabled: {
+    marginTop: 24,
+    marginBottom: 32,
+    marginLeft: 16,
+    marginRight: 16,
+    height: 52,
+    backgroundColor: Colors.primaryColor,
+    borderColor: Colors.noticeText,
     opacity: 0.5,
   },
   buttonText: {
