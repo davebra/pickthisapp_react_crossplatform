@@ -11,6 +11,7 @@ PickThisApp React Native, Final Assignment project for the Cross Platform subjec
 
 * Clone the project
 * enter the folder and install dependencies `npm install`
+* clone the file `env.sample` to `.env` and add your env details
 * link react native dependencies `react-native link`
 * start the project with `react-native run-ios` or `react-native run-android`
 
@@ -32,7 +33,8 @@ PickThisApp React Native, Final Assignment project for the Cross Platform subjec
 * react-native-loading-spinner-overlay (loading overlay)
 * react-timestamp (format date time)
 * react-native-fbsdk (library for allow the FB login)
-* react-native-image-picker (library for allow the Google login)
+* react-native-googlesignin (library for allow the Google login)
+* react-native-lightbox (library for lightbox effect for the click on images)
 
 #### Extra Infos
 
