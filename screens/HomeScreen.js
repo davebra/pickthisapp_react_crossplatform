@@ -225,14 +225,15 @@ export default class HomeScreen extends React.Component {
   onMarkerPress = (i) => {
     // do not move the map if marker is clicked
     this.moveTheMap = false; 
+    this.loadNewThings = false;
 
+    this.setState({
+      showSwiper: true,
+      selectedMarker: this.state.thingsMarkers[i]._id
+    });
+    
     // scroll the Swiper to the right thing
     this.refs.swiper._scrollToIndex(i);
-
-    this.setState({selectedMarker: this.state.thingsMarkers[i]._id});
-
-    // if not visible, show the Swiper
-    if(!this.state.showSwiper) this.setState({showSwiper: true});
 
   }
 
