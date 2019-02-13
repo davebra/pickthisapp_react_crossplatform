@@ -11,6 +11,8 @@ import { GoogleSignin, statusCodes } from 'react-native-google-signin';
 import Fonts from '../constants/Fonts';
 
 export default class LoginScreen extends React.Component {
+  _isMounted = false;
+
   state = {
     userLogged: false,
     chooseNickname: false,
@@ -21,6 +23,7 @@ export default class LoginScreen extends React.Component {
 
   // execute immediatly after Login Screen is mounted
   componentDidMount() {
+    this._isMounted = true;
 
     GoogleSignin.configure({
       webClientId: GOOGLE_AUTH_WEB_CLIENT_ID,
@@ -30,6 +33,10 @@ export default class LoginScreen extends React.Component {
       iosClientId: GOOGLE_AUTH_IOS_CLIENT_ID,
     });
 
+  }
+  
+  componentWillUnmount() {
+    this._isMounted = false;
   }
 
   render() {
@@ -98,14 +105,16 @@ export default class LoginScreen extends React.Component {
 
     // check if is the user is already logged in
     AsyncStorage.getItem('userToken').then( value => {
-      if (value == null) {
-        this.setState({ userLogged: false });
-      } else {
-        this.setState({ 
-          userLogged: true, 
-          chooseNickname: false,
-          showErrorMessage: false,
-          userData: jwtDecode(value) });
+      if (this._isMounted) {
+        if (value == null) {
+          this.setState({ userLogged: false });
+        } else {
+          this.setState({ 
+            userLogged: true, 
+            chooseNickname: false,
+            showErrorMessage: false,
+            userData: jwtDecode(value) });
+        }
       }
     });
 

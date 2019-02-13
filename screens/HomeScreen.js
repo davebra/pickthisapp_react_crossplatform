@@ -29,7 +29,9 @@ export default class HomeScreen extends React.Component {
     
     // property that I need to update the states only when I want
     this.moveTheMap = true;
-    this.loadNewThings = true;
+    this.loadNewThings = false;
+    this.firstLoad = false;
+    this.actualRegion = {};
     this.downloadedThings = [];
   }
 
@@ -211,7 +213,8 @@ export default class HomeScreen extends React.Component {
                 latitudeDelta: 0.1, 
                 longitudeDelta: 0.1
             }, 600);
-            this.loadNewThings = true;
+            this.firstLoad = true;
+            this.loadNewThings = false;
         },
         error => console.log(error.message),
         { enableHighAccuracy: false, timeout: 20000, maximumAge: 1000 }
@@ -259,42 +262,51 @@ export default class HomeScreen extends React.Component {
 
   // manage map movement event, fetch and reload markers
   onRegionChangeComplete = (region) => {
-    if(this.loadNewThings){
-      getThings(
-        region.latitude, 
-        region.longitude, 
-        this.calculateDistance(
-            region.latitude - region.latitudeDelta,
-            region.longitude - region.longitudeDelta,
-            region.latitude + region.latitudeDelta,
-            region.longitude + region.longitudeDelta
-        )
-        ).then(res => { 
-            if( typeof res.message === 'string' ){
-              this.refs.toast.show('Please zoom in to search', DURATION.FOREVER);
-            }
-            if( Array.isArray(res) ){
-              this.refs.toast.close();
-              let newThings = [];
-                res.forEach(thing => {
-                    if (!this.downloadedThings.includes(thing._id)) {
-                        newThings.push(thing);
-                        this.downloadedThings.push(thing._id);
-                    }
-                });
+    this.actualRegion = region;
 
-                if(newThings.length > 0){
-                    this.setState({
-                        thingsMarkers: this.state.thingsMarkers.concat(newThings)
-                    });
-                }
-            }
-        }).catch(err => { 
-            console.log(err) 
+    if(this.firstLoad){
+      this.fetchNewThings();
+      this.firstLoad = false;
+    } else {
+
+      if(this.loadNewThings){
+        this.refs.toast.show('Tap to search in this area', DURATION.FOREVER, () => {}, () => {
+          this.fetchNewThings();
         });
+      } else {
+        this.refs.toast.close();
+        // set back the loadNewThings to true, in case was false
+        this.loadNewThings = true;
+      }
+
     }
-    // set back the loadNewThings to true
-    this.loadNewThings = true;
+
+  }
+
+  fetchNewThings = () => {
+    getThings(
+      this.actualRegion.latitude, 
+      this.actualRegion.longitude, 
+      this.calculateDistance(
+        this.actualRegion.latitude - this.actualRegion.latitudeDelta,
+        this.actualRegion.longitude - this.actualRegion.longitudeDelta,
+        this.actualRegion.latitude + this.actualRegion.latitudeDelta,
+        this.actualRegion.longitude + this.actualRegion.longitudeDelta
+      )
+      ).then(res => { 
+          if( typeof res.message === 'string' ){
+            this.refs.toast.show('Please zoom in to search', DURATION.LENGHT_LONG);
+          }
+          if( Array.isArray(res) ){
+            this.refs.toast.close();
+            this.setState({
+              showSwiper: false,
+              thingsMarkers: res
+            });
+          }
+      }).catch(err => { 
+          console.log(err) 
+      }); 
   }
 
   // function to open the single Ting screen passing the object content
